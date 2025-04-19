@@ -6,10 +6,11 @@ using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
+using Bl.Agrobook.Financial.Func.Model;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
-internal class FinancialApiService
+public class FinancialApiService
 {
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
     private static JsonSerializerOptions _jsonSerializerOptions = new()
@@ -33,7 +34,7 @@ internal class FinancialApiService
         _logger = logger;
     }
 
-    public async IAsyncEnumerable<JsonElement> GetProductsAsync(
+    public async IAsyncEnumerable<JsonNode> GetProductsAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -43,11 +44,29 @@ internal class FinancialApiService
 
     }
 
-    private async Task EnsureApiAuthenticatedAsync(CancellationToken cancellationToken = default)
+    public async Task<JsonNode> CreateOrderAsync(
+        CancellationToken cancellationToken = default)
     {
-        if (!IsTokenExpired(_client.DefaultRequestHeaders.Authorization?.Parameter))
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await EnsureApiAuthenticatedAsync(cancellationToken);
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/orders")
         {
-            return;
+            Content = JsonContent.Create(
+                new CreateCustomerOrderViewModel(),
+                options: _jsonSerializerOptions)
+        };
+
+
+    }
+
+    private async Task<InternalUserInfo> EnsureApiAuthenticatedAsync(CancellationToken cancellationToken = default)
+    {
+        var token = _client.DefaultRequestHeaders.Authorization?.Parameter;
+        if (!IsTokenExpired(token))
+        {
+            return InternalUserInfo.CreateByToken(token);
         }
 
         try
@@ -56,7 +75,7 @@ internal class FinancialApiService
 
             if (!IsTokenExpired(_client.DefaultRequestHeaders.Authorization?.Parameter))
             {
-                return;
+                return InternalUserInfo.CreateByToken(token);
             }
 
             using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/authenticate")
@@ -82,7 +101,7 @@ internal class FinancialApiService
 
             var content = await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken);
 
-            var token = content?["token"]?.ToString();
+            token = content?["token"]?.ToString();
 
             if (IsTokenExpired(token))
             {
@@ -90,6 +109,8 @@ internal class FinancialApiService
             }
 
             _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+
+            return InternalUserInfo.CreateByToken(token);
         }
         finally
         {
@@ -125,5 +146,24 @@ internal class FinancialApiService
         }
 
         return null;
+    }
+
+    private record InternalUserInfo(
+        int ShopCode,
+        string Email)
+    {
+
+        public static InternalUserInfo CreateByToken(string? jwtToken)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(jwtToken);
+            var handler = new JwtSecurityTokenHandler();
+
+            if (!handler.CanReadToken(jwtToken))
+                throw new InvalidOperationException($"Invalid token: {jwtToken}");
+            
+            var token = handler.ReadJwtToken(jwtToken);
+
+            return new((int)token.Payload["shopcode"], token.Payload.Sub);
+        }
     }
 }
