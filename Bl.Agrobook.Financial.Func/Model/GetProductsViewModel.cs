@@ -5,7 +5,7 @@ namespace Bl.Agrobook.Financial.Func.Model;
 public class GetProductsViewModel
 {
     [JsonPropertyName("content")]
-    public List<ContentProductViewModel> Content { get; set; } = new();
+    public List<ProductViewModel> Content { get; set; } = new();
 
     [JsonPropertyName("pageable")]
     public PagenableViewModel Pageable { get; set; } = new();
@@ -41,7 +41,7 @@ public class GetProductsViewModel
     public bool? Empty { get; set; }
 }
 
-public class ContentProductViewModel
+public class ProductViewModel
 {
     [JsonPropertyName("uid")]
     public string Uid { get; set; } = string.Empty;
@@ -74,10 +74,10 @@ public class ContentProductViewModel
     public bool? HasStock { get; set; }
 
     [JsonPropertyName("current_stock")]
-    public double? CurrentStock { get; set; }
+    public decimal? CurrentStock { get; set; }
 
     [JsonPropertyName("stock")]
-    public double? Stock { get; set; }
+    public decimal? Stock { get; set; }
 
     [JsonPropertyName("stockmin")]
     public double? Stockmin { get; set; }
@@ -107,7 +107,7 @@ public class ContentProductViewModel
     public bool? Combo { get; set; }
 
     [JsonPropertyName("profit_margin")]
-    public double? ProfitMargin { get; set; }
+    public decimal? ProfitMargin { get; set; }
 
     [JsonPropertyName("obs")]
     public string? Obs { get; set; }
@@ -116,7 +116,7 @@ public class ContentProductViewModel
     public bool? CanChangePrice { get; set; }
 
     [JsonPropertyName("price")]
-    public double? Price { get; set; }
+    public decimal? Price { get; set; }
 
     [JsonPropertyName("auto_price")]
     public bool? AutoPrice { get; set; }
@@ -158,7 +158,7 @@ public class ContentProductViewModel
     public Brand Brand { get; set; } = new();
 
     [JsonPropertyName("reserved_stock")]
-    public double? ReservedStock { get; set; }
+    public decimal? ReservedStock { get; set; }
 
     [JsonPropertyName("photos")]
     public List<object> Photos { get; set; } = new();

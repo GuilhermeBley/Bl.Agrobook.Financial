@@ -47,13 +47,13 @@ public class CreateCustomerOrderViewModel
     public int? Discount { get; set; }
 
     [JsonPropertyName("final_value")]
-    public int? FinalValue { get; set; }
+    public decimal? FinalValue { get; set; }
 
     [JsonPropertyName("gross_value")]
-    public int? GrossValue { get; set; }
+    public decimal? GrossValue { get; set; }
 
     [JsonPropertyName("net_value")]
-    public int? NetValue { get; set; }
+    public decimal? NetValue { get; set; }
 
     [JsonPropertyName("items_discount")]
     public int? ItemsDiscount { get; set; }
@@ -191,13 +191,13 @@ public class Product
     public string? EanGtin { get; set; }
 
     [JsonPropertyName("final_value")]
-    public int? FinalValue { get; set; }
+    public decimal? FinalValue { get; set; }
 
     [JsonPropertyName("fractional_sale")]
     public bool? FractionalSale { get; set; }
 
     [JsonPropertyName("gross_value")]
-    public int? GrossValue { get; set; }
+    public decimal? GrossValue { get; set; }
 
     [JsonPropertyName("image_url")]
     public string? ImageUrl { get; set; }
@@ -206,7 +206,7 @@ public class Product
     public int? ItemDiscount { get; set; }
 
     [JsonPropertyName("net_value")]
-    public int? NetValue { get; set; }
+    public decimal? NetValue { get; set; }
 
     [JsonPropertyName("obs")]
     public string? Obs { get; set; }
@@ -221,7 +221,7 @@ public class Product
     public bool? PercentualSale { get; set; }
 
     [JsonPropertyName("price")]
-    public int? Price { get; set; }
+    public decimal? Price { get; set; }
 
     [JsonPropertyName("prorated_discount")]
     public int? ProratedDiscount { get; set; }
@@ -272,7 +272,7 @@ public class Product
     public bool? Combo { get; set; }
 
     [JsonPropertyName("cost_price")]
-    public double? CostPrice { get; set; }
+    public decimal? CostPrice { get; set; }
 
     [JsonPropertyName("localization")]
     public string? Localization { get; set; }
@@ -281,7 +281,7 @@ public class Product
     public string? Eangtin { get; set; }
 
     [JsonPropertyName("stock")]
-    public int? Stock { get; set; }
+    public decimal? Stock { get; set; }
 
     [JsonPropertyName("stockmin")]
     public int? Stockmin { get; set; }
@@ -320,7 +320,7 @@ public class Product
     public bool? HasStock { get; set; }
 
     [JsonPropertyName("current_stock")]
-    public int? CurrentStock { get; set; }
+    public decimal? CurrentStock { get; set; }
 
     [JsonPropertyName("stockmax")]
     public int? Stockmax { get; set; }
@@ -347,7 +347,7 @@ public class Product
     public Subcategory Subcategory { get; set; } = new();
 
     [JsonPropertyName("reserved_stock")]
-    public int? ReservedStock { get; set; }
+    public decimal? ReservedStock { get; set; }
 
     [JsonPropertyName("photos")]
     public List<object> Photos { get; set; } = new();

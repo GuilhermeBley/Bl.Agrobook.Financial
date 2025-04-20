@@ -38,7 +38,7 @@ public class FinancialApiService
         _logger = logger;
     }
 
-    public async IAsyncEnumerable<ContentProductViewModel> GetProductsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<ProductViewModel> GetProductsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
