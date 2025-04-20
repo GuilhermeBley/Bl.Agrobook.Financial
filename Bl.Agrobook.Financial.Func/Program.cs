@@ -1,3 +1,4 @@
+using Bl.Agrobook.Financial.Func.Options;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,15 @@ var host = new HostBuilder()
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
+
+        services.Configure<FinancialApiOptions>(cfg =>
+        {
+            cfg.Login = ctx.Configuration[$"FinancialApi:Login"] ?? throw new ArgumentNullException("Login");
+            cfg.Password = ctx.Configuration[$"FinancialApi:Password"] ?? throw new ArgumentNullException("Password");
+            cfg.BaseUrl = ctx.Configuration[$"FinancialApi:BaseUrl"] ?? throw new ArgumentNullException("BaseUrl");
+            cfg.AuthBaseUrl = ctx.Configuration[$"FinancialApi:AuthBaseUrl"] ?? throw new ArgumentNullException("BaseUrl");
+        });
+
 
         services.AddLogging()
             .AddMemoryCache()

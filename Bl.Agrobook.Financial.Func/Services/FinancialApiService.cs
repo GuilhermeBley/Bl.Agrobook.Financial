@@ -8,6 +8,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using Bl.Agrobook.Financial.Func.Model;
 using System.Text.Json.Serialization;
+using System.Net;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
@@ -51,7 +52,8 @@ public class FinancialApiService
 
             if (!response.IsSuccessStatusCode)
             {
-                break;
+                throw new HttpRequestException(message: 
+                    $"Invalid status code {response.StatusCode} and body: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             }
 
             var result = await response.Content.ReadFromJsonAsync<GetProductsViewModel>(_jsonSerializerOptions, cancellationToken)
@@ -86,7 +88,8 @@ public class FinancialApiService
 
             if (!response.IsSuccessStatusCode)
             {
-                break;
+                throw new HttpRequestException(message:
+                    $"Invalid status code {response.StatusCode} and body: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             }
 
             var result = await response.Content.ReadFromJsonAsync<GetCustomerViewModel>(_jsonSerializerOptions, cancellationToken)
@@ -152,11 +155,14 @@ public class FinancialApiService
                 return InternalUserInfo.CreateByToken(token);
             }
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/authenticate")
+            var authurl = string.Concat(_options.BaseUrl.Trim('/'), '/', "api/v1/authenticate");
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(authurl))
             {
                 Content = JsonContent.Create(new
                 {
-                    login = _options.Login,
+                    origin = 3,
+                    username = _options.Login,
                     password = _options.Password
                 },
                 options: _jsonSerializerOptions)
@@ -194,6 +200,8 @@ public class FinancialApiService
 
     private static bool IsTokenExpired(string? jwtToken)
     {
+        if (string.IsNullOrEmpty(jwtToken)) return true;
+
         var expirationTime = GetTokenExpirationTime(jwtToken);
         return expirationTime.HasValue && expirationTime.Value.AddMinutes(-2) < DateTime.UtcNow;
     }
@@ -237,7 +245,7 @@ public class FinancialApiService
             
             var token = handler.ReadJwtToken(jwtToken);
 
-            return new((int)token.Payload["shopcode"], token.Payload.Sub);
+            return new(int.Parse(token.Payload["shopcode"].ToString() ?? string.Empty), token.Payload.Sub);
         }
     }
 

@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>c71ed753-ad7d-4db8-af5a-0ec33ff82f45</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -21,6 +22,7 @@
 	<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
 	<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
+	<PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
