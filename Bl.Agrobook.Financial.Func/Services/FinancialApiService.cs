@@ -17,6 +17,11 @@ public class FinancialApiService
     {
     };
 
+    static FinancialApiOptions()
+    {
+        _jsonSerializerOptions.Converters.Add(); // date converter
+    }
+
     private readonly HttpClient _client;
     private readonly FinancialApiOptions _options;
     private readonly ILogger<FinancialApiService> _logger;
@@ -49,16 +54,27 @@ public class FinancialApiService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        await EnsureApiAuthenticatedAsync(cancellationToken);
+        var userInfo = await EnsureApiAuthenticatedAsync(cancellationToken);
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/orders")
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/v1/order/{userInfo.ShopCode}")
         {
+            // add the body            
             Content = JsonContent.Create(
                 new CreateCustomerOrderViewModel(),
                 options: _jsonSerializerOptions)
         };
 
+        var response = await _client.SendAsync(request, cancellationToken);
 
+        if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.ToString() != "application/json")
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Failed to create order with the financial API. See the error body:\n{body}");
+        }
+
+        return await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken)
+            ?? throw new HttpRequestException("Invalid status code 200 body response.");
     }
 
     private async Task<InternalUserInfo> EnsureApiAuthenticatedAsync(CancellationToken cancellationToken = default)
