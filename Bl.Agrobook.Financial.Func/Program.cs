@@ -23,7 +23,8 @@ var host = new HostBuilder()
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
-            .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>();
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.CsvOrderReader>();
     })
     .ConfigureAppConfiguration(builder =>
     {

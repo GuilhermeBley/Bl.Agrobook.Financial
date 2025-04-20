@@ -9,14 +9,17 @@ namespace Bl.Agrobook.Financial.Func;
 public class FinancialFunction
 {
     private readonly ILogger<FinancialFunction> _logger;
+    private readonly CsvOrderReader _csvOrderReader;
     private readonly FinancialApiService _financialApiService;
 
     public FinancialFunction(
         ILogger<FinancialFunction> logger,
-        FinancialApiService financialApiService)
+        FinancialApiService financialApiService,
+        CsvOrderReader csvOrderReader)
     {
         _logger = logger;
         _financialApiService = financialApiService;
+        _csvOrderReader = csvOrderReader;
     }
 
     [Function("FinancialOrder")]
@@ -29,6 +32,14 @@ public class FinancialFunction
         {
             return new UnauthorizedResult();
         }
+
+        var file = req.Form.Files[0];
+        using var fileStream = file.OpenReadStream();
+        var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cancellationToken);
+        var ordersToCreate = orders.ToDictionary(o => o.CustomerCode, o =>
+        {
+
+        });
 
         try
         {
