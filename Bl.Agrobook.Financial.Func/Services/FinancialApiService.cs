@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using Bl.Agrobook.Financial.Func.Model;
+using System.Text.Json.Serialization;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
@@ -15,12 +16,9 @@ public class FinancialApiService
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
     private static JsonSerializerOptions _jsonSerializerOptions = new()
     {
+        WriteIndented = true,
+        Converters = { new IsoDateTimeConverter() },
     };
-
-    static FinancialApiOptions()
-    {
-        _jsonSerializerOptions.Converters.Add(); // date converter
-    }
 
     private readonly HttpClient _client;
     private readonly FinancialApiOptions _options;
@@ -39,14 +37,74 @@ public class FinancialApiService
         _logger = logger;
     }
 
-    public async IAsyncEnumerable<JsonNode> GetProductsAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<ContentProductViewModel> GetProductsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        await EnsureApiAuthenticatedAsync(cancellationToken);
+        var userInfo = await EnsureApiAuthenticatedAsync(cancellationToken);
 
+        var page = 0;
+        const int pageSize = 50;
+        do
+        {
+            using var response = await _client.GetAsync($"api/v1/product/{userInfo.ShopCode}?page={page}&size={pageSize}&sort=description&direction=asc&pdv=false&filter=active", cancellationToken);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                break;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<GetProductsViewModel>(_jsonSerializerOptions, cancellationToken)
+                ?? throw new HttpRequestException("Invalid status code 200 body response.");
+
+            foreach (var c in result.Content)
+            {
+                yield return c;
+            }
+
+            if (result.TotalPages == (page + 1) || result.Content.Count == 0)
+            {
+                break;
+            }
+
+            page++;
+
+        } while (!cancellationToken.IsCancellationRequested);
+    }
+
+    public async IAsyncEnumerable<CustomerViewModel> GetCustomersAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var userInfo = await EnsureApiAuthenticatedAsync(cancellationToken);
+
+        var page = 0;
+        const int pageSize = 50;
+        do
+        {
+            using var response = await _client.GetAsync($"api/v1/customer/{userInfo.ShopCode}?&page={page}&size={pageSize}&sort=name&direction=asc&&filter=active&stats=true", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                break;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<GetCustomerViewModel>(_jsonSerializerOptions, cancellationToken)
+                ?? throw new HttpRequestException("Invalid status code 200 body response.");
+
+            foreach (var c in result.Content)
+            {
+                yield return c;
+            }
+
+            if (result.TotalPages == (page + 1) || result.Content.Count == 0)
+            {
+                break;
+            }
+
+            page++;
+
+        } while (!cancellationToken.IsCancellationRequested);
     }
 
     public async Task<JsonNode> CreateOrderAsync(
@@ -180,6 +238,19 @@ public class FinancialApiService
             var token = handler.ReadJwtToken(jwtToken);
 
             return new((int)token.Payload["shopcode"], token.Payload.Sub);
+        }
+    }
+
+    private class IsoDateTimeConverter : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return DateTime.Parse(reader.GetString() ?? string.Empty);
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
         }
     }
 }
