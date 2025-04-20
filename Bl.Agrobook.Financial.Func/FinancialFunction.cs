@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
 namespace Bl.Agrobook.Financial.Func;
 
@@ -42,7 +41,7 @@ public class FinancialFunction
 
             _logger.LogInformation("Products: {Products}", products.Count);
 
-            var customers = await _financialApiService.GetProductsAsync().ToListAsync(cancellationToken);
+            var customers = await _financialApiService.GetCustomersAsync().ToListAsync(cancellationToken);
 
             if (customers.Count == 0)
             {

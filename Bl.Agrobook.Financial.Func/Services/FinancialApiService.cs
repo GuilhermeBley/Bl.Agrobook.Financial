@@ -155,7 +155,7 @@ public class FinancialApiService
                 return InternalUserInfo.CreateByToken(token);
             }
 
-            var authurl = string.Concat(_options.BaseUrl.Trim('/'), '/', "api/v1/authenticate");
+            var authurl = string.Concat(_options.AuthBaseUrl.Trim('/'), '/', "api/v1/authenticate");
 
             using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(authurl))
             {
