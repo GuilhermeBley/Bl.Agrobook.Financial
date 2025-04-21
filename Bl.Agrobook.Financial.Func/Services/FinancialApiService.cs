@@ -111,6 +111,7 @@ public class FinancialApiService
     }
 
     public async Task<JsonNode> CreateOrderAsync(
+        CreateCustomerOrderViewModel order,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -121,7 +122,7 @@ public class FinancialApiService
         {
             // add the body            
             Content = JsonContent.Create(
-                new CreateCustomerOrderViewModel(),
+                order,
                 options: _jsonSerializerOptions)
         };
 
