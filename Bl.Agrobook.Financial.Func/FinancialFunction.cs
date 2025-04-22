@@ -1,8 +1,6 @@
 using Bl.Agrobook.Financial.Func.Model;
 using Bl.Agrobook.Financial.Func.Services;
-using CsvHelper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -76,10 +74,10 @@ public class FinancialFunction
                     creationResult.Add(new()
                     {
                         Status = "Ok",
-                        Code = result.Code,
+                        Code = result["code"]?.ToString(),
                         Message = string.Empty,
                         Price = createModel.NetValue!.Value,
-                        CustomerName = createModel.Customer.Name
+                        CustomerName = createModel.Customer.Name ?? string.Empty
                     });
                 }
                 catch (Exception e)
@@ -199,9 +197,7 @@ public class FinancialFunction
                     ComboParent = false,
                     CommissionPercentage = 0,
                     CommissionProfit = false,
-                    CostPrice = order.Price,
                     CurrentStock = product.CurrentStock,
-                    Price = order.Price,
                     Debt = 0,
                     Description = product.Description,
                     DefaultMarkup = product.DefaultMarkup,
@@ -209,9 +205,7 @@ public class FinancialFunction
                     Eangtin = product.Eangtin,
                     EanGtin = product.Eangtin,
                     ExtraCode = product.ExtraCode,
-                    FinalValue = order.Price,
                     FractionalSale = false,
-                    GrossValue = order.Price,
                     GrossWeigth = 0,
                     HasStock = product.HasStock,
                     Id = 0,
@@ -221,7 +215,6 @@ public class FinancialFunction
                     IsPriceEdited = true, // use the price from the CSV
                     ItemDiscount = 0,
                     Localization = string.Empty,
-                    NetValue = order.Price,
                     NetWeigth = 0,
                     NoTax = false,
                     Obs = string.Empty,
@@ -245,7 +238,13 @@ public class FinancialFunction
                     TaxDetails = new(),
                     TaxUseGlobal = false,
                     Unit = product.Unit,
-                    UnitPrice = new()
+                    UnitPrice = 0,
+
+                    CostPrice = order.Price,
+                    Price = order.Price,
+                    FinalValue = order.Price * order.Quantity,
+                    GrossValue = order.Price * order.Quantity,
+                    NetValue = order.Price * order.Quantity,
                 });
                 o.FinalValue += order.Price * order.Quantity;
                 o.GrossValue = o.FinalValue;
