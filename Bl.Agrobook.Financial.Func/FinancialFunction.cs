@@ -90,7 +90,7 @@ public class FinancialFunction
                         {
                             Status = "Ok",
                             Code = orderAlreadyAdded?.Code,
-                            Message = $"Nota {orderAlreadyAdded?.Code} já aberta para cliente {createModel.Customer.Name}.",
+                            Message = $"Nenhum novo pedido criado, pedido {orderAlreadyAdded?.Code} já aberto para cliente {createModel.Customer.Name}.",
                             Price = createModel.FinalValue ?? 0,
                             CustomerName = createModel.Customer.Name ?? string.Empty
                         });
@@ -151,9 +151,9 @@ public class FinancialFunction
     {
         using var fileStream = formFile.OpenReadStream();
         var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cultureInfo, cancellationToken);
-        Dictionary<int, CreateCustomerOrderViewModel> ordersByCustomer = new();
+        Dictionary<string, CreateCustomerOrderViewModel> ordersByCustomer = new();
 
-        for (var i = 0; i <= orders.Length; i++)
+        for (var i = 0; i < orders.Length; i++)
         {
             try
             {
@@ -292,7 +292,7 @@ public class FinancialFunction
             {
                 var csvDataRow = i + 1/*index*/ + 1 /*CSV header*/;
                 _logger.LogError(e, "Error processing order {i}", csvDataRow);
-                throw new Exception($"Falha ao processar linha {csvDataRow}. " + e.Message);
+                throw new Exception($"Falha ao processar linha {csvDataRow}. " + e.Message, e);
             }
         }
 

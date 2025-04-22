@@ -10,8 +10,8 @@ public class GetSalesHistoryViewModel
     [JsonPropertyName("totalValue")]
     public double? TotalValue { get; set; }
 
-    [JsonPropertyName("sales")]
-    public SalesHistoryResultViewModel Sales { get; set; } = new();
+    [JsonPropertyName("orders")]
+    public SalesHistoryResultViewModel Orders { get; set; } = new();
 }
 
 public class SalesHistoryResultViewModel
@@ -100,9 +100,6 @@ public class SaleHistoryViewModel
     [JsonPropertyName("origin")]
     public int? Origin { get; set; }
 
-    [JsonPropertyName("tax")]
-    public Tax Tax { get; set; } = new();
-
     [JsonPropertyName("prorated_discount")]
     public double? ProratedDiscount { get; set; }
 
@@ -159,9 +156,6 @@ public class SaleHistoryViewModel
 
     [JsonPropertyName("customer")]
     public Customer Customer { get; set; } = new();
-
-    [JsonPropertyName("products")]
-    public List<Product> Products { get; set; } = [];
 
     [JsonPropertyName("pending_payment")]
     public bool? PendingPayment { get; set; }

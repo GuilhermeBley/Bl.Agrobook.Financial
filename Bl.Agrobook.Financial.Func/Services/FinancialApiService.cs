@@ -178,12 +178,12 @@ public class FinancialApiService
             var result = await response.Content.ReadFromJsonAsync<GetSalesHistoryViewModel>(_jsonSerializerOptions, cancellationToken)
                 ?? throw new HttpRequestException("Invalid status code 200 body response.");
 
-            foreach (var c in result.Sales.Content)
+            foreach (var c in result.Orders.Content)
             {
                 yield return c;
             }
 
-            if (result.Sales.TotalPages == (page + 1) || result.Sales.Content.Count == 0)
+            if (result.Orders.TotalPages == (page + 1) || result.Orders.Content.Count == 0)
             {
                 break;
             }

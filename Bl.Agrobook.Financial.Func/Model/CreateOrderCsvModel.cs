@@ -2,8 +2,8 @@
 
 public class CreateOrderCsvModel
 {
-    public int CustomerCode { get; set; }
-    public int ProductCode { get; set; }
+    public string CustomerCode { get; set; } = string.Empty;
+    public string ProductCode { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal Price { get; set; }
 }
