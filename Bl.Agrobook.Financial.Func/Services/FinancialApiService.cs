@@ -8,8 +8,6 @@ using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using Bl.Agrobook.Financial.Func.Model;
 using System.Text.Json.Serialization;
-using System.Net;
-using Grpc.Core;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
@@ -152,11 +150,11 @@ public class FinancialApiService
         const int pageSize = 50;
         do
         {
-            var status = new Dictionary<object, object>();
+            var status = new List<int>();
             DateTime? datebegin = null;
             DateTime? dateend = null;
 
-            if (alreadyOpen) status.Add(0, 1);
+            if (alreadyOpen) status.Add(1);
 
             using var response = await _client.PostAsJsonAsync(
                 $"api/v1/order/{userInfo.ShopCode}/historic?page={page}&size={pageSize}&sort=included_on&direction=desc",

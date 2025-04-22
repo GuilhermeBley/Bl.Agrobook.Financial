@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace Bl.Agrobook.Financial.Func;
 
@@ -61,18 +62,42 @@ public class FinancialFunction
 
             _logger.LogInformation("Customers: {customers}", customers.Count);
 
-            var curentOpenedOrders = await _financialApiService.GetOrdersAsync(alreadyOpen: true).ToListAsync(cancellationToken);
+            var currentOpenedOrders = await _financialApiService.GetOrdersAsync(alreadyOpen: true).ToListAsync(cancellationToken);
 
-            _logger.LogInformation("curentOpenedOrders: {customers}", curentOpenedOrders.Count);
+            _logger.LogInformation("curentOpenedOrders: {customers}", currentOpenedOrders.Count);
 
-            var createModels = await MapOrdersByFormFileAsync(file, products, customers, cancellationToken);
+            var cultureInfoQuery = req.Query["cultureInfo"].ToString();
+
+            if (string.IsNullOrWhiteSpace(cultureInfoQuery)) cultureInfoQuery = "pt-BR";
+
+            var createModels = await MapOrdersByFormFileAsync(new(cultureInfoQuery), file, products, customers, cancellationToken);
 
             var creationResult = new List<CreationOrderResultCsvModel>();
 
+            var activeOrdersByCustomerId = currentOpenedOrders
+                .Select(e => e.Customer.Uid)
+                .ToHashSet();
+
             foreach (var createModel in createModels)
             {
+                var currentCustomerId = createModel.Customer.Uid;
                 try
                 {
+                    if (!activeOrdersByCustomerId.Add(currentCustomerId))
+                    {
+                        var orderAlreadyAdded = currentOpenedOrders.FirstOrDefault(e => e.Customer.Uid == currentCustomerId);
+                        creationResult.Add(new()
+                        {
+                            Status = "Ok",
+                            Code = orderAlreadyAdded?.Code,
+                            Message = $"Nota {orderAlreadyAdded?.Code} já aberta para cliente {createModel.Customer.Name}.",
+                            Price = createModel.FinalValue ?? 0,
+                            CustomerName = createModel.Customer.Name ?? string.Empty
+                        });
+                        continue;
+                    }
+
+
                     var result = await _financialApiService.CreateOrderAsync(createModel, cancellationToken);
 
                     creationResult.Add(new()
@@ -80,7 +105,7 @@ public class FinancialFunction
                         Status = "Ok",
                         Code = result["code"]?.ToString(),
                         Message = string.Empty,
-                        Price = createModel.NetValue!.Value,
+                        Price = createModel.NetValue ?? 0,
                         CustomerName = createModel.Customer.Name ?? string.Empty
                     });
                 }
@@ -99,6 +124,14 @@ public class FinancialFunction
 
             return new OkObjectResult(creationResult);
         }
+        catch (CsvHelper.HeaderValidationException e)
+        {
+            return new BadRequestObjectResult(new
+            {
+                Message = "Falha em validação de cabeçalho de CSV. Segue cabeçalhos que não puderam ser mapeados:\n" 
+                    + string.Join('\n', e.InvalidHeaders.Select(e => e.Names[0]))
+            });
+        }
         catch(Exception e)
         {
             _logger.LogError(e, "An error occurred while processing the request.");
@@ -110,13 +143,14 @@ public class FinancialFunction
     }
 
     private async Task<CreateCustomerOrderViewModel[]> MapOrdersByFormFileAsync(
+        CultureInfo cultureInfo,
         IFormFile formFile,
         IReadOnlyList<ProductViewModel> products,
         IReadOnlyList<CustomerViewModel> customers,
         CancellationToken cancellationToken = default)
     {
         using var fileStream = formFile.OpenReadStream();
-        var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cancellationToken);
+        var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cultureInfo, cancellationToken);
         Dictionary<int, CreateCustomerOrderViewModel> ordersByCustomer = new();
 
         for (var i = 0; i <= orders.Length; i++)
@@ -256,9 +290,9 @@ public class FinancialFunction
             }
             catch (Exception e)
             {
-                var csvRow = i + 1;
-                _logger.LogError(e, "Error processing order {i}", csvRow);
-                throw new Exception($"Falha ao processar linha {csvRow}. " + e.Message);
+                var csvDataRow = i + 1/*index*/ + 1 /*CSV header*/;
+                _logger.LogError(e, "Error processing order {i}", csvDataRow);
+                throw new Exception($"Falha ao processar linha {csvDataRow}. " + e.Message);
             }
         }
 

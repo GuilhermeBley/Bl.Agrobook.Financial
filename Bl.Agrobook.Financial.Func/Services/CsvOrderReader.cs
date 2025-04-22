@@ -8,8 +8,6 @@ namespace Bl.Agrobook.Financial.Func.Services;
 
 public class CsvOrderReader
 {
-    private readonly static CultureInfo cultureInfo = new("pt-BR");
-
     private readonly ILogger<CsvOrderReader> _logger;
 
     public CsvOrderReader(ILogger<CsvOrderReader> logger)
@@ -17,7 +15,7 @@ public class CsvOrderReader
         _logger = logger;
     }
 
-    public async Task<CreateOrderCsvModel[]> MapCreateOrderCsvAsync(Stream stream, CancellationToken cancellationToken = default)
+    public async Task<CreateOrderCsvModel[]> MapCreateOrderCsvAsync(Stream stream, CultureInfo cultureInfo, CancellationToken cancellationToken = default)
     {
         try
         {
