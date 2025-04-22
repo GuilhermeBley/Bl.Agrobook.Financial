@@ -18,11 +18,16 @@ var host = new HostBuilder()
             cfg.BaseUrl = ctx.Configuration[$"FinancialApi:BaseUrl"] ?? throw new ArgumentNullException("BaseUrl");
             cfg.AuthBaseUrl = ctx.Configuration[$"FinancialApi:AuthBaseUrl"] ?? throw new ArgumentNullException("BaseUrl");
         });
+        services.Configure<AzureTableOption>(cfg =>
+        {
+            cfg.StorageKey = ctx.Configuration[$"AzureTableOption:StorageKey"] ?? throw new ArgumentNullException("StorageKey");
+        });
 
 
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.CsvOrderReader>();
     })

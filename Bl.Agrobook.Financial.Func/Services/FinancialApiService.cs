@@ -8,6 +8,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using Bl.Agrobook.Financial.Func.Model;
 using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
@@ -23,8 +24,10 @@ public class FinancialApiService
     private readonly HttpClient _client;
     private readonly FinancialApiOptions _options;
     private readonly ILogger<FinancialApiService> _logger;
+    private readonly AgrobookAuthRepository _tokenRepo;
 
     public FinancialApiService(
+        AgrobookAuthRepository tokenRepo,
         IOptions<FinancialApiOptions> options,
         IHttpClientFactory factory,
         ILogger<FinancialApiService> logger)
@@ -35,6 +38,7 @@ public class FinancialApiService
         _client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36");
         _options = options.Value;
         _logger = logger;
+        _tokenRepo = tokenRepo;
     }
 
     public async IAsyncEnumerable<ProductViewModel> GetProductsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -210,6 +214,14 @@ public class FinancialApiService
                 return InternalUserInfo.CreateByToken(token);
             }
 
+            var objStorageToken = await _tokenRepo.GetLastTokenAsync(cancellationToken);
+
+            if (objStorageToken is not null &&
+                !IsTokenExpired(objStorageToken.Token))
+            {
+                return InternalUserInfo.CreateByToken(objStorageToken.Token );
+            }
+
             var authurl = string.Concat(_options.AuthBaseUrl.Trim('/'), '/', "api/v1/authenticate");
 
             using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(authurl))
@@ -243,6 +255,8 @@ public class FinancialApiService
                 throw new HttpRequestException($"Failed to authenticate with the financial API. Token '{token}' is invalid.");
             }
 
+            await _tokenRepo.UpdateTokenAsync(token, cancellationToken);
+
             _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
 
             return InternalUserInfo.CreateByToken(token);
@@ -253,7 +267,7 @@ public class FinancialApiService
         }
     }
 
-    private static bool IsTokenExpired(string? jwtToken)
+    private static bool IsTokenExpired([NotNullWhen(false)]string? jwtToken)
     {
         if (string.IsNullOrEmpty(jwtToken)) return true;
 
