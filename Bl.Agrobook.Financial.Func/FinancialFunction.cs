@@ -33,8 +33,8 @@ public class FinancialFunction
         {
             return new UnauthorizedResult();
         }
-
-        if (req.Form.Files.Count == 0)
+        
+        if (!req.HasFormContentType || req.Form.Files.Count == 0)
         {
             return new BadRequestObjectResult("No file uploaded.");
         }
@@ -59,7 +59,11 @@ public class FinancialFunction
                 return new NotFoundObjectResult("No customers found.");
             }
 
-            _logger.LogInformation("Customers: {customers}", products.Count);
+            _logger.LogInformation("Customers: {customers}", customers.Count);
+
+            var curentOpenedOrders = await _financialApiService.GetOrdersAsync(alreadyOpen: true).ToListAsync(cancellationToken);
+
+            _logger.LogInformation("curentOpenedOrders: {customers}", curentOpenedOrders.Count);
 
             var createModels = await MapOrdersByFormFileAsync(file, products, customers, cancellationToken);
 

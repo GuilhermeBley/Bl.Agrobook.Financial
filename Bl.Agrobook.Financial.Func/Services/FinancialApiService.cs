@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using Bl.Agrobook.Financial.Func.Model;
 using System.Text.Json.Serialization;
 using System.Net;
+using Grpc.Core;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
@@ -31,7 +32,7 @@ public class FinancialApiService
         ILogger<FinancialApiService> logger)
     {
         _client = factory.CreateClient("FinancialApi");
-        _client.BaseAddress = new(options.Value.BaseUrl );
+        _client.BaseAddress = new(options.Value.BaseUrl);
         _client.DefaultRequestHeaders.Add("Accept", "application/json");
         _client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36");
         _options = options.Value;
@@ -52,7 +53,7 @@ public class FinancialApiService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException(message: 
+                throw new HttpRequestException(message:
                     $"Invalid status code {response.StatusCode} and body: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             }
 
@@ -137,6 +138,61 @@ public class FinancialApiService
 
         return await response.Content.ReadFromJsonAsync<JsonNode>(cancellationToken)
             ?? throw new HttpRequestException("Invalid status code 200 body response.");
+    }
+
+    public async IAsyncEnumerable<SaleHistoryViewModel> GetOrdersAsync(
+        bool alreadyOpen = true,
+        [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var userInfo = await EnsureApiAuthenticatedAsync(cancellationToken);
+
+        var page = 0;
+        const int pageSize = 50;
+        do
+        {
+            var status = new Dictionary<object, object>();
+            DateTime? datebegin = null;
+            DateTime? dateend = null;
+
+            if (alreadyOpen) status.Add(0, 1);
+
+            using var response = await _client.PostAsJsonAsync(
+                $"api/v1/order/{userInfo.ShopCode}/historic?page={page}&size={pageSize}&sort=included_on&direction=desc",
+                new
+                {
+                    canceled = false,
+                    datebegin = datebegin,
+                    dateend = dateend,
+                    origin = Array.Empty<object>(),
+                    search = "",
+                    status = status
+                },
+                cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(message:
+                    $"Invalid status code {response.StatusCode} and body: {await response.Content.ReadAsStringAsync(cancellationToken)}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<GetSalesHistoryViewModel>(_jsonSerializerOptions, cancellationToken)
+                ?? throw new HttpRequestException("Invalid status code 200 body response.");
+
+            foreach (var c in result.Sales.Content)
+            {
+                yield return c;
+            }
+
+            if (result.Sales.TotalPages == (page + 1) || result.Sales.Content.Count == 0)
+            {
+                break;
+            }
+
+            page++;
+
+        } while (!cancellationToken.IsCancellationRequested);
     }
 
     private async Task<InternalUserInfo> EnsureApiAuthenticatedAsync(CancellationToken cancellationToken = default)
@@ -243,7 +299,7 @@ public class FinancialApiService
 
             if (!handler.CanReadToken(jwtToken))
                 throw new InvalidOperationException($"Invalid token: {jwtToken}");
-            
+
             var token = handler.ReadJwtToken(jwtToken);
 
             return new(int.Parse(token.Payload["shopcode"].ToString() ?? string.Empty), token.Payload.Sub);
