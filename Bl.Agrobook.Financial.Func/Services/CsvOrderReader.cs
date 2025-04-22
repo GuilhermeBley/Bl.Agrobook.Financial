@@ -19,6 +19,7 @@ public class CsvOrderReader
     {
         try
         {
+            if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin);
             using var reader = new StreamReader(stream);
             using var csv = new CsvReader(reader, new CsvConfiguration(cultureInfo)
             {
@@ -27,11 +28,21 @@ public class CsvOrderReader
                 BadDataFound = context =>
                 {
                     _logger.LogWarning($"Bad data found at row {context.Field}: {context.RawRecord}");
+                },
+                ShouldSkipRecord = (record) =>
+                {
+                    var row = record.Row;
+                    if (row.TryGetField<string>(0, out _)) // Check if at least 1 field exists
+                    {
+                        // Get all fields and check if they're empty
+                        var fields = row.Parser.Record ?? [];
+                        return fields.All(field => string.IsNullOrWhiteSpace(field) || field.Trim() == ";");
+                    }
+                    return true; // Skip if no fields
                 }
             });
 
             csv.Context.RegisterClassMap<InternalOrderCsvMapper>();
-
             var orders = await csv.GetRecordsAsync<CreateOrderCsvModel>().ToArrayAsync();
 
             _logger.LogInformation($"Successfully processed {orders.Length} orders");
