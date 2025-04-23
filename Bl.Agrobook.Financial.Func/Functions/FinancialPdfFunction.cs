@@ -60,7 +60,7 @@ internal class FinancialPdfFunction
             // Create a table with two columns for the two-side layout
             var table = new Table(2).UseAllAvailableWidth();
 
-            foreach (var order in orders)
+            foreach (var order in orders.OrderBy(o => o.Products.Count))
             {
                 // Create a cell for the left or right side
                 var cell = new Cell()

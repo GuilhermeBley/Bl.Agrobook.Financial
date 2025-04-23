@@ -44,6 +44,14 @@ public class FinancialOrderFunction
 
         try
         {
+            var cultureInfoQuery = req.Query["cultureInfo"].ToString();
+
+            if (string.IsNullOrWhiteSpace(cultureInfoQuery)) cultureInfoQuery = "pt-BR";
+
+            CultureInfo cultureInfo = new(cultureInfoQuery);
+
+            await CheckFileAsync(cultureInfo, file, cancellationToken);
+
             var products = await _financialApiService.GetProductsAsync().ToListAsync(cancellationToken);
 
             if (products.Count == 0)
@@ -66,11 +74,7 @@ public class FinancialOrderFunction
 
             _logger.LogInformation("curentOpenedOrders: {customers}", currentOpenedOrders.Count);
 
-            var cultureInfoQuery = req.Query["cultureInfo"].ToString();
-
-            if (string.IsNullOrWhiteSpace(cultureInfoQuery)) cultureInfoQuery = "pt-BR";
-
-            var createModels = await MapOrdersByFormFileAsync(new(cultureInfoQuery), file, products, customers, cancellationToken);
+            var createModels = await MapOrdersByFormFileAsync(cultureInfo, file, products, customers, cancellationToken);
 
             var creationResult = new List<CreationOrderResultCsvModel>();
 
@@ -97,7 +101,6 @@ public class FinancialOrderFunction
                         continue;
                     }
 
-
                     var result = await _financialApiService.CreateOrderAsync(createModel, cancellationToken);
 
                     creationResult.Add(new()
@@ -108,6 +111,8 @@ public class FinancialOrderFunction
                         Price = createModel.NetValue ?? 0,
                         CustomerName = createModel.Customer.Name ?? string.Empty
                     });
+
+                    await Task.Delay(200, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -142,6 +147,17 @@ public class FinancialOrderFunction
         }
     }
 
+    private async Task<CreateOrderCsvModel[]> CheckFileAsync(
+        CultureInfo cultureInfo,
+        IFormFile formFile,
+        CancellationToken cancellationToken = default)
+    {
+        using var fileStream = formFile.OpenReadStream();
+        if (fileStream.CanSeek) fileStream.Seek(0, SeekOrigin.Begin);
+        var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cultureInfo, cancellationToken);
+        return orders;
+    }
+
     private async Task<CreateCustomerOrderViewModel[]> MapOrdersByFormFileAsync(
         CultureInfo cultureInfo,
         IFormFile formFile,
@@ -150,6 +166,7 @@ public class FinancialOrderFunction
         CancellationToken cancellationToken = default)
     {
         using var fileStream = formFile.OpenReadStream();
+        if (fileStream.CanSeek) fileStream.Seek(0, SeekOrigin.Begin);
         var orders = await _csvOrderReader.MapCreateOrderCsvAsync(fileStream, cultureInfo, cancellationToken);
         Dictionary<string, CreateCustomerOrderViewModel> ordersByCustomer = new();
 
