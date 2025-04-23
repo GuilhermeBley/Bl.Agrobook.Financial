@@ -8,7 +8,7 @@ public class GetSalesHistoryViewModel
     public int? TotalQty { get; set; }
 
     [JsonPropertyName("totalValue")]
-    public double? TotalValue { get; set; }
+    public decimal? TotalValue { get; set; }
 
     [JsonPropertyName("orders")]
     public SalesHistoryResultViewModel Orders { get; set; } = new();
@@ -80,7 +80,7 @@ public class SaleHistoryViewModel
     public string? CanceledBy { get; set; }
 
     [JsonPropertyName("commission")]
-    public double? Commission { get; set; }
+    public decimal? Commission { get; set; }
 
     [JsonPropertyName("status")]
     public int? Status { get; set; }
@@ -92,7 +92,7 @@ public class SaleHistoryViewModel
     public bool? Deliver { get; set; }
 
     [JsonPropertyName("delivery_tax")]
-    public double? DeliveryTax { get; set; }
+    public decimal? DeliveryTax { get; set; }
 
     [JsonPropertyName("seller")]
     public Seller Seller { get; set; } = new();
@@ -101,28 +101,28 @@ public class SaleHistoryViewModel
     public int? Origin { get; set; }
 
     [JsonPropertyName("prorated_discount")]
-    public double? ProratedDiscount { get; set; }
+    public decimal? ProratedDiscount { get; set; }
 
     [JsonPropertyName("items_discount")]
-    public double? ItemsDiscount { get; set; }
+    public decimal? ItemsDiscount { get; set; }
 
     [JsonPropertyName("discount")]
-    public double? Discount { get; set; }
+    public decimal? Discount { get; set; }
 
     [JsonPropertyName("percentual_sale")]
     public bool? PercentualSale { get; set; }
 
     [JsonPropertyName("percentage_discount")]
-    public double? PercentageDiscount { get; set; }
+    public decimal? PercentageDiscount { get; set; }
 
     [JsonPropertyName("net_value")]
-    public double? NetValue { get; set; }
+    public decimal? NetValue { get; set; }
 
     [JsonPropertyName("gross_value")]
-    public double? GrossValue { get; set; }
+    public decimal? GrossValue { get; set; }
 
     [JsonPropertyName("final_value")]
-    public double? FinalValue { get; set; }
+    public decimal? FinalValue { get; set; }
 
     [JsonPropertyName("obs")]
     public string? Obs { get; set; }
@@ -131,32 +131,131 @@ public class SaleHistoryViewModel
     public string Code { get; set; } = string.Empty;
 
     [JsonPropertyName("payd")]
-    public double? Payd { get; set; }
+    public decimal? Payd { get; set; }
 
     [JsonPropertyName("profit")]
-    public double? Profit { get; set; }
+    public decimal? Profit { get; set; }
 
     [JsonPropertyName("debt")]
-    public double? Debt { get; set; }
+    public decimal? Debt { get; set; }
 
     [JsonPropertyName("credit")]
-    public double? Credit { get; set; }
+    public decimal? Credit { get; set; }
 
     [JsonPropertyName("credit_value")]
-    public double? CreditValue { get; set; }
+    public decimal? CreditValue { get; set; }
 
     [JsonPropertyName("used_credit")]
-    public double? UsedCredit { get; set; }
+    public decimal? UsedCredit { get; set; }
 
     [JsonPropertyName("qty")]
-    public double? Qty { get; set; }
+    public decimal? Qty { get; set; }
 
     [JsonPropertyName("change")]
-    public double? Change { get; set; }
+    public decimal? Change { get; set; }
 
     [JsonPropertyName("customer")]
     public Customer Customer { get; set; } = new();
 
+    [JsonPropertyName("products")]
+    public List<SaleProduct> Products { get; set; } = new();
+
     [JsonPropertyName("pending_payment")]
     public bool? PendingPayment { get; set; }
+}
+
+public class SaleProduct
+{
+    [JsonPropertyName("uid")]
+    public string Uid { get; set; } = string.Empty;
+
+    [JsonPropertyName("uid_itran")]
+    public string? UidItran { get; set; }
+
+    [JsonPropertyName("uid_movest")]
+    public string? UidMovest { get; set; }
+
+    [JsonPropertyName("code")]
+    public string Code { get; set; } = string.Empty;
+
+    [JsonPropertyName("commission")]
+    public decimal? Commission { get; set; }
+
+    [JsonPropertyName("commission_percentage")]
+    public decimal? CommissionPercentage { get; set; }
+
+    [JsonPropertyName("commission_profit")]
+    public bool? CommissionProfit { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("qty")]
+    public decimal? Qty { get; set; }
+
+    [JsonPropertyName("price")]
+    public decimal? Price { get; set; }
+
+    [JsonPropertyName("discount")]
+    public decimal? Discount { get; set; }
+
+    [JsonPropertyName("prorated_discount")]
+    public decimal? ProratedDiscount { get; set; }
+
+    [JsonPropertyName("item_discount")]
+    public decimal? ItemDiscount { get; set; }
+
+    [JsonPropertyName("percentual_sale")]
+    public bool? PercentualSale { get; set; }
+
+    [JsonPropertyName("percentage_discount")]
+    public decimal? PercentageDiscount { get; set; }
+
+    [JsonPropertyName("gross_value")]
+    public decimal? GrossValue { get; set; }
+
+    [JsonPropertyName("net_value")]
+    public decimal? NetValue { get; set; }
+
+    [JsonPropertyName("final_value")]
+    public decimal? FinalValue { get; set; }
+
+    [JsonPropertyName("debt")]
+    public decimal? Debt { get; set; }
+
+    [JsonPropertyName("payd")]
+    public decimal? Payd { get; set; }
+
+    [JsonPropertyName("fractional_sale")]
+    public bool? FractionalSale { get; set; }
+
+    [JsonPropertyName("profit")]
+    public decimal? Profit { get; set; }
+
+    [JsonPropertyName("cost_price")]
+    public decimal? CostPrice { get; set; }
+
+    [JsonPropertyName("cost_total")]
+    public decimal? CostTotal { get; set; }
+
+    [JsonPropertyName("combo_parent")]
+    public bool? ComboParent { get; set; }
+
+    [JsonPropertyName("combo_child")]
+    public bool? ComboChild { get; set; }
+
+    [JsonPropertyName("uid_combo_parent")]
+    public string? UidComboParent { get; set; }
+
+    [JsonPropertyName("image_url")]
+    public string? ImageUrl { get; set; }
+
+    [JsonPropertyName("category")]
+    public object? Category { get; set; }
+
+    [JsonPropertyName("unit")]
+    public object? Unit { get; set; }
+
+    [JsonPropertyName("obs")]
+    public string? Obs { get; set; }
 }

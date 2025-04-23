@@ -175,8 +175,9 @@ public class FinancialApiService
 
             if (!response.IsSuccessStatusCode)
             {
+                var textError = await response.Content.ReadAsStringAsync(cancellationToken);
                 throw new HttpRequestException(message:
-                    $"Invalid status code {response.StatusCode} and body: {await response.Content.ReadAsStringAsync(cancellationToken)}");
+                    $"Invalid status code {response.StatusCode} and body: {textError}");
             }
 
             var result = await response.Content.ReadFromJsonAsync<GetSalesHistoryViewModel>(_jsonSerializerOptions, cancellationToken)
@@ -219,6 +220,7 @@ public class FinancialApiService
             if (objStorageToken is not null &&
                 !IsTokenExpired(objStorageToken.Token))
             {
+                _client.DefaultRequestHeaders.Authorization = new("Bearer", objStorageToken.Token);
                 return InternalUserInfo.CreateByToken(objStorageToken.Token );
             }
 

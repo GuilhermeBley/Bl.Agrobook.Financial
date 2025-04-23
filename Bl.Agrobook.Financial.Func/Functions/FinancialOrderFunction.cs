@@ -6,16 +6,16 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
-namespace Bl.Agrobook.Financial.Func;
+namespace Bl.Agrobook.Financial.Func.Functions;
 
-public class FinancialFunction
+public class FinancialOrderFunction
 {
-    private readonly ILogger<FinancialFunction> _logger;
+    private readonly ILogger<FinancialOrderFunction> _logger;
     private readonly CsvOrderReader _csvOrderReader;
     private readonly FinancialApiService _financialApiService;
 
-    public FinancialFunction(
-        ILogger<FinancialFunction> logger,
+    public FinancialOrderFunction(
+        ILogger<FinancialOrderFunction> logger,
         FinancialApiService financialApiService,
         CsvOrderReader csvOrderReader)
     {
@@ -137,7 +137,7 @@ public class FinancialFunction
             _logger.LogError(e, "An error occurred while processing the request.");
             return new BadRequestObjectResult(new
             {
-                Message = e.Message
+                e.Message
             });
         }
     }
