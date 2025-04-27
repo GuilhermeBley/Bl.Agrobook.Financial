@@ -12,17 +12,20 @@ namespace Bl.Agrobook.Financial.Func.Functions;
 
 internal class FinancialPdfFunction
 {
+    private readonly ILogger _logger;
     private readonly FinancialApiService _api;
 
-    public FinancialPdfFunction(FinancialApiService api)
+    public FinancialPdfFunction(
+        FinancialApiService api,
+        ILogger<FinancialPdfFunction> logger)
     {
+        _logger = logger;
         _api = api;
     }
 
     [Function("GeneratePdf")]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "financial/order/pdf")] HttpRequest req,
-        ILogger log,
         CancellationToken cancellationToken = default)
     {
         if (!req.Headers.TryGetValue("x-api-key", out var apiKey) ||
@@ -69,7 +72,7 @@ internal class FinancialPdfFunction
 
                 // Add order title
                 cell.Add(new Paragraph($"{order.Customer.Name} ({order.Code})")
-                    .SetFontSize(14)
+                    .SetFontSize(11)
                     .SimulateBold());
 
                 // Add order items
@@ -78,7 +81,10 @@ internal class FinancialPdfFunction
 
                 foreach (var product in order.Products)
                 {
-                    list.Add(new ListItem($"{product.Description} - {product.Qty}"));
+                    var listItem = new ListItem($"□ {product.Description} - {product.Qty?.ToString("0")}");
+                    listItem.SetFontSize(10);
+
+                    list.Add(listItem);
                 }
 
                 cell.Add(list);
@@ -101,7 +107,7 @@ internal class FinancialPdfFunction
         }
         catch (Exception e)
         {
-            log.LogError(e, "An error occurred while processing the request.");
+            _logger.LogError(e, "An error occurred while processing the request.");
             return new BadRequestObjectResult(new
             {
                 e.Message
