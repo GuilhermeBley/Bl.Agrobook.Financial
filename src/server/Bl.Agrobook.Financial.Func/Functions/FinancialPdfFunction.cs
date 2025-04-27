@@ -2,6 +2,7 @@
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Renderer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -69,6 +70,7 @@ internal class FinancialPdfFunction
             {
                 // Create a cell for the left or right side
                 var cell = new Cell()
+                    .SetKeepTogether(true)
                     .SetPadding(10)
                     .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
 
