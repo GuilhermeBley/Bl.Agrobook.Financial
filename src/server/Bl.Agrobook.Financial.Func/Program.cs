@@ -22,11 +22,16 @@ var host = new HostBuilder()
         {
             cfg.StorageKey = ctx.Configuration[$"AzureTableOption:StorageKey"] ?? throw new ArgumentNullException("StorageKey");
         });
+        services.Configure<AuthOptions>(cfg =>
+        {
+            cfg.Key = ctx.Configuration[$"AuthOptions:Key"] ?? throw new ArgumentNullException("AuthOptions");
+        });
 
 
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.CsvOrderReader>();

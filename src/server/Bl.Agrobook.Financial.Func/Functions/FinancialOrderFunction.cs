@@ -10,15 +10,18 @@ namespace Bl.Agrobook.Financial.Func.Functions;
 
 public class FinancialOrderFunction
 {
+    private readonly AuthService _authService;
     private readonly ILogger<FinancialOrderFunction> _logger;
     private readonly CsvOrderReader _csvOrderReader;
     private readonly FinancialApiService _financialApiService;
 
     public FinancialOrderFunction(
+        AuthService authService,
         ILogger<FinancialOrderFunction> logger,
         FinancialApiService financialApiService,
         CsvOrderReader csvOrderReader)
     {
+        _authService = authService;
         _logger = logger;
         _financialApiService = financialApiService;
         _csvOrderReader = csvOrderReader;
@@ -29,12 +32,11 @@ public class FinancialOrderFunction
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/order/batch")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
-        if (!req.Headers.TryGetValue("x-api-key", out var apiKey) ||
-            apiKey != Environment.GetEnvironmentVariable("ExpectedApiKey"))
+        if (!_authService.IsAuthenticated(req))
         {
             return new UnauthorizedResult();
         }
-        
+
         if (!req.HasFormContentType || req.Form.Files.Count == 0)
         {
             return new BadRequestObjectResult("No file uploaded.");

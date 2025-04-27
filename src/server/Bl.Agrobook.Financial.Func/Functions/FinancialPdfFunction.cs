@@ -12,13 +12,16 @@ namespace Bl.Agrobook.Financial.Func.Functions;
 
 internal class FinancialPdfFunction
 {
+    private readonly AuthService _authService;
     private readonly ILogger _logger;
     private readonly FinancialApiService _api;
 
     public FinancialPdfFunction(
+        AuthService authService,
         FinancialApiService api,
         ILogger<FinancialPdfFunction> logger)
     {
+        _authService = authService;
         _logger = logger;
         _api = api;
     }
@@ -28,8 +31,7 @@ internal class FinancialPdfFunction
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "financial/order/pdf")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
-        if (!req.Headers.TryGetValue("x-api-key", out var apiKey) ||
-            apiKey != Environment.GetEnvironmentVariable("ExpectedApiKey"))
+        if (!_authService.IsAuthenticated(req))
         {
             return new UnauthorizedResult();
         }
