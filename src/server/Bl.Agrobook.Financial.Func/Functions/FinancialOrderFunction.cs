@@ -98,7 +98,7 @@ public class FinancialOrderFunction
                 var keyId = (createModel.Customer.Uid, DateOnly.FromDateTime(DateTime.Now));
                 try
                 {
-                    if (!activeOrders.ContainsKey(keyId))
+                    if (activeOrders.ContainsKey(keyId))
                     {
                         var orderAlreadyAdded = activeOrders[keyId];
                         creationResult.Add(new()
