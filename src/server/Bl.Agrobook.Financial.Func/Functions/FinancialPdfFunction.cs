@@ -40,7 +40,13 @@ internal class FinancialPdfFunction
         try
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = System.Text.Json.JsonSerializer.Deserialize<JsonNode>(requestBody);
+
+            JsonNode? data = null;
+            try
+            {
+                data = System.Text.Json.JsonSerializer.Deserialize<JsonNode>(requestBody);
+            }
+            catch { }
 
             var date = data?["orderDate"]?.ToString();
 
@@ -106,7 +112,7 @@ internal class FinancialPdfFunction
 
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
-                FileDownloadName = $"Pedidos-{DateTime.Now:yyyy-MM-dd}.pdf"
+                FileDownloadName = $"Pedidos-{date:yyyy-MM-dd}.pdf"
             };
         }
         catch (Exception e)

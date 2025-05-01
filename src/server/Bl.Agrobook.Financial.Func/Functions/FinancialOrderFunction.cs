@@ -80,18 +80,27 @@ public class FinancialOrderFunction
 
             var creationResult = new List<CreationOrderResultCsvModel>();
 
-            var activeOrdersByCustomerId = currentOpenedOrders
-                .Select(e => e.Customer.Uid)
-                .ToHashSet();
+            var activeOrders = currentOpenedOrders
+                .Where(e => e.Date is not null)
+                .Select(e => new { 
+                    Key = (e.Customer.Uid, DateOnly.FromDateTime(e.Date!.Value)),
+                    Value = e
+                })
+                .DistinctBy(e => e.Key)
+                .ToDictionary(e => e.Key, e => e.Value);
 
             foreach (var createModel in createModels)
             {
-                var currentCustomerId = createModel.Customer.Uid;
+                //
+                // Check if the order already exists for the customer
+                // The check will be matched by the customer UID and the date of the order compared to the current date
+                //
+                var keyId = (createModel.Customer.Uid, DateOnly.FromDateTime(DateTime.Now));
                 try
                 {
-                    if (!activeOrdersByCustomerId.Add(currentCustomerId))
+                    if (activeOrders.ContainsKey(keyId))
                     {
-                        var orderAlreadyAdded = currentOpenedOrders.FirstOrDefault(e => e.Customer.Uid == currentCustomerId);
+                        var orderAlreadyAdded = activeOrders[keyId];
                         creationResult.Add(new()
                         {
                             Status = "Ok",
