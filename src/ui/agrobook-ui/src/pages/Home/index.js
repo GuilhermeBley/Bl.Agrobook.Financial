@@ -23,25 +23,25 @@ function Home() {
 
                                 <h6 class="mt-4">Price Range</h6>
                                 <div class="range-slider mt-2">
-                                    <input type="range" class="form-range" min="0" max="1000" step="10" id="priceRange"/>
-                                        <div class="d-flex justify-content-between">
-                                            <span>$0</span>
-                                            <span>$1000</span>
-                                        </div>
+                                    <input type="range" class="form-range" min="0" max="1000" step="10" id="priceRange" />
+                                    <div class="d-flex justify-content-between">
+                                        <span>$0</span>
+                                        <span>$1000</span>
+                                    </div>
                                 </div>
 
                                 <h6 class="mt-4">Brand</h6>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="brand1"/>
-                                        <label class="form-check-label" for="brand1">Brand A</label>
+                                    <input class="form-check-input" type="checkbox" id="brand1" />
+                                    <label class="form-check-label" for="brand1">Brand A</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="brand2"/>
-                                        <label class="form-check-label" for="brand2">Brand B</label>
+                                    <input class="form-check-input" type="checkbox" id="brand2" />
+                                    <label class="form-check-label" for="brand2">Brand B</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="brand3"/>
-                                        <label class="form-check-label" for="brand3">Brand C</label>
+                                    <input class="form-check-input" type="checkbox" id="brand3" />
+                                    <label class="form-check-label" for="brand3">Brand C</label>
                                 </div>
 
                                 <button class="btn btn-primary w-100 mt-3">Apply Filters</button>
@@ -54,10 +54,10 @@ function Home() {
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search products..."/>
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="fas fa-search"></i>
-                                        </button>
+                                    <input type="text" class="form-control" placeholder="Search products..." />
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="bi bi-search"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="col-md-6 text-md-end">
@@ -83,154 +83,154 @@ function Home() {
                         <div class="row">
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
-                                    <span class="badge bg-danger badge-sale">Sale</span>
-                                    <img src="https://via.placeholder.com/300x200?text=Product+1" class="card-img-top" alt="Product 1"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">Wireless Headphones</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
-                                                <span class="text-muted ms-1">(24)</span>
-                                            </div>
-                                            <p class="card-text">High-quality wireless headphones with noise cancellation.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <span class="price">$89.99</span>
-                                                    <span class="old-price ms-2">$129.99</span>
+                                    <img src="oliveira-flores512.jpg" class="card-img-top" alt="Product 1" width="512" height="250" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">Wireless Headphones</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <span class="text-muted ms-1">(24)</span>
+                                        </div>
+                                        <p class="card-text">High-quality wireless headphones with noise cancellation.</p>
+                                        <div class="d-flex justify-content-end align-items-end text-end">
+                                            <div class="input-group">
+                                                <input className="form-control" type="number" value={1} style={{maxWidth: 4 + 'rem'}}/>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-primary" type="button" title="Adicionar no carrinho" alt="Adicionar no carrinho">
+                                                        <i class="bi bi-bag-plus"></i>
+                                                    </button>
                                                 </div>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
-                                    <img src="https://via.placeholder.com/300x200?text=Product+2" class="card-img-top" alt="Product 2"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">Smart Watch</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <span class="text-muted ms-1">(18)</span>
-                                            </div>
-                                            <p class="card-text">Fitness tracker and smartwatch with heart rate monitor.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="price">$149.99</span>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
-                                            </div>
+                                    <img src="https://via.placeholder.com/300x200?text=Product+2" class="card-img-top" alt="Product 2" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">Smart Watch</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <span class="text-muted ms-1">(18)</span>
                                         </div>
+                                        <p class="card-text">Fitness tracker and smartwatch with heart rate monitor.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="price">$149.99</span>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
                                     <span class="badge bg-success badge-sale">New</span>
-                                    <img src="https://via.placeholder.com/300x200?text=Product+3" class="card-img-top" alt="Product 3"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">Bluetooth Speaker</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <span class="text-muted ms-1">(42)</span>
-                                            </div>
-                                            <p class="card-text">Portable waterproof speaker with 20-hour battery life.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="price">$59.99</span>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
-                                            </div>
+                                    <img src="https://via.placeholder.com/300x200?text=Product+3" class="card-img-top" alt="Product 3" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">Bluetooth Speaker</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <span class="text-muted ms-1">(42)</span>
                                         </div>
+                                        <p class="card-text">Portable waterproof speaker with 20-hour battery life.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="price">$59.99</span>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
-                                    <img src="https://via.placeholder.com/300x200?text=Product+4" class="card-img-top" alt="Product 4"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">Laptop Backpack</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
-                                                <span class="text-muted ms-1">(31)</span>
-                                            </div>
-                                            <p class="card-text">Durable backpack with USB charging port and anti-theft design.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="price">$39.99</span>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
-                                            </div>
+                                    <img src="https://via.placeholder.com/300x200?text=Product+4" class="card-img-top" alt="Product 4" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">Laptop Backpack</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <span class="text-muted ms-1">(31)</span>
                                         </div>
+                                        <p class="card-text">Durable backpack with USB charging port and anti-theft design.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="price">$39.99</span>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
-                                    <img src="https://via.placeholder.com/300x200?text=Product+5" class="card-img-top" alt="Product 5"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">Wireless Charger</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <span class="text-muted ms-1">(15)</span>
-                                            </div>
-                                            <p class="card-text">Fast charging pad compatible with all Qi-enabled devices.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="price">$24.99</span>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
-                                            </div>
+                                    <img src="https://via.placeholder.com/300x200?text=Product+5" class="card-img-top" alt="Product 5" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">Wireless Charger</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <span class="text-muted ms-1">(15)</span>
                                         </div>
+                                        <p class="card-text">Fast charging pad compatible with all Qi-enabled devices.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="price">$24.99</span>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
                                     <span class="badge bg-danger badge-sale">-30%</span>
-                                    <img src="https://via.placeholder.com/300x200?text=Product+6" class="card-img-top" alt="Product 6"/>
-                                        <div class="card-body">
-                                            <h5 class="card-title">4K Action Camera</h5>
-                                            <div class="rating mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
-                                                <span class="text-muted ms-1">(27)</span>
-                                            </div>
-                                            <p class="card-text">Waterproof camera with 4K video and image stabilization.</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <span class="price">$199.99</span>
-                                                    <span class="old-price ms-2">$279.99</span>
-                                                </div>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
-                                            </div>
+                                    <img src="https://via.placeholder.com/300x200?text=Product+6" class="card-img-top" alt="Product 6" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">4K Action Camera</h5>
+                                        <div class="rating mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <span class="text-muted ms-1">(27)</span>
                                         </div>
+                                        <p class="card-text">Waterproof camera with 4K video and image stabilization.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="price">$199.99</span>
+                                                <span class="old-price ms-2">$279.99</span>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
