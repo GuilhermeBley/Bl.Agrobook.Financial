@@ -99,6 +99,14 @@ internal class FinancialPdfFunction
 
                 cell.Add(list);
 
+                if (!string.IsNullOrEmpty(order.Obs) &&
+                    !order.Obs.Contains("Venda isenta de impostos", StringComparison.OrdinalIgnoreCase))
+                {
+                    cell.Add(new Paragraph($"Obs: {order.Obs}")
+                        .SetFontSize(9)
+                        .SetMarginTop(5));
+                }
+
                 // Add the cell to the table
                 table.AddCell(cell);
             }
