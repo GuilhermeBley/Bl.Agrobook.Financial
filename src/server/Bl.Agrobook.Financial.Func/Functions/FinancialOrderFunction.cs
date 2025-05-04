@@ -238,11 +238,16 @@ public class FinancialOrderFunction
                         }
                     };
                 }
+
                 var product = products.FirstOrDefault(p => p.Code == order.ProductCode.ToString());
 
                 ArgumentNullException.ThrowIfNull(product, $"Product with code {order.ProductCode} not found.");
 
                 var o = ordersByCustomer[order.CustomerCode];
+
+                if (!string.IsNullOrWhiteSpace(order.ObsPedido))
+                    o.Obs = string.Join(", ", [o.Obs, order.ObsPedido.Trim(' ', '.', ',', '\n')]);
+                
                 o.Products.Add(new()
                 {
                     Uid = product.Uid,

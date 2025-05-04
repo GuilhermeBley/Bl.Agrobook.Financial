@@ -74,9 +74,7 @@ public class CsvOrderReader
             Map(m => m.ProductCode).Name("Codigo do produto");
             Map(m => m.Quantity).Name("Quantidade");
             Map(m => m.Price).Name("Preco");
-            // If your CSV has different column names:
-            // Map(m => m.CustomerCode).Name("CustCode");
-            // Map(m => m.Price).Name("UnitPrice");
+            Map(m => m.ObsPedido).Name("Obs Pedido");
         }
     }
 }
