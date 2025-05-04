@@ -246,7 +246,10 @@ public class FinancialOrderFunction
                 var o = ordersByCustomer[order.CustomerCode];
 
                 if (!string.IsNullOrWhiteSpace(order.ObsPedido))
-                    o.Obs = string.Join(", ", [o.Obs, order.ObsPedido.Trim(' ', '.', ',', '\n'), "."]);
+                {
+                    var obss = new string?[] { o.Obs?.Trim('.'), order.ObsPedido.Trim(' ', '.', ',', '\n') + "." };
+                    o.Obs = string.Join(", ", obss.Where(e => !string.IsNullOrEmpty(e)));
+                }
                 
                 o.Products.Add(new()
                 {

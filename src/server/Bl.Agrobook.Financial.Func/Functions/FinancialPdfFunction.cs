@@ -99,6 +99,8 @@ internal class FinancialPdfFunction
 
                 cell.Add(list);
 
+                order.Obs = order.Obs?.Replace("Venda isenta de impostos ", "");
+
                 if (!string.IsNullOrEmpty(order.Obs) &&
                     !order.Obs.Contains("Venda isenta de impostos", StringComparison.OrdinalIgnoreCase))
                 {

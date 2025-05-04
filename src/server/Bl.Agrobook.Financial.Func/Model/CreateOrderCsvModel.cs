@@ -7,6 +7,11 @@ public class CreateOrderCsvModel
     public int Quantity { get; set; }
     public decimal Price { get; set; }
     public string? ObsPedido { get; set; }
+
+    public override string ToString()
+    {
+        return $"{CustomerCode}-{ProductCode}-{Quantity}-{Price}-{ObsPedido}";
+    }
 }
 
 
