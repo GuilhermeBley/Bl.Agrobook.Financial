@@ -22,6 +22,20 @@ function PageNavigationBar() {
                                 </Link>
                             </li>
                         </ul>
+
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <h6 class="dropdown-header mx-2">Token do usuário</h6>
+                                        <input type="password" className="form-control" placeholder="Digite o token"/>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
