@@ -1,14 +1,85 @@
-export const postFileAsync = async () => {
+import api from "../../api/AzFunApi"
+
+export const postFileAsync = async (file) => {
     try {
-        const response = await fetch('https://api.example.com/data');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await api.post(
+            'api/financial/order/batch',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+        if (response.status === 401) {
+            return {
+                Status: Status.Unauthorized,
+                Data: undefined
+            };
         }
+
         const result = await response.json();
-        setData(result);
+        
+        return {
+            Status: Status.Ok,
+            Data: result
+        };
     } catch (err) {
-        setError(err.message);
-    } finally {
-        setLoading(false);
+        console.error('Failed to generate orders.', err)
+        
+        return {
+            Status: Status.Failed,
+            Data: "Falha ao processar."
+        };
     }
 }
+
+export const generatePdf = async (orderDate) => {
+    try {
+        const response = await api.post(
+            'api/financial/order/pdf',
+            {
+                orderDate: orderDate
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                responseType: 'blob'
+            });
+
+        if (response.status === 401) {
+            return {
+                Status: Status.Unauthorized,
+                Data: undefined
+            };
+        }
+
+        if (contentType === 'application/pdf') {
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            return {
+                Status: Status.Ok,
+                Data: blob
+            };
+        }
+
+        throw new Error('Unexpected response type: ' + contentType);
+    } catch (err) {
+        console.error('Failed to generate PDF.', err)
+        return {
+            Status: Status.Failed,
+            Data: "Falha ao processar."
+        };
+    }
+}
+
+export const Status = {
+    Unauthorized: 'Não autorizado',
+    Ok: 'Ok',
+    NoData: 'Nenhum dado encontrado',
+    Failed: 'Falha'
+};
