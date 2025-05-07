@@ -1,6 +1,19 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function PageNavigationBar() {
+
+    useEffect(() => {
+        // TODO: set the token from the local storage to the input
+        // then add the 
+    }, [])
+
+    const handleInputChange = () => {
+        // TODO: change the input
+        // TODO: change axios default headers
+        // TODO: change the local storage
+    }
+
     return (
         <>
             <nav class="navbar navbar-expand-lg">
