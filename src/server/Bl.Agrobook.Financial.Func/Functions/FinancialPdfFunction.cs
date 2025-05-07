@@ -54,7 +54,7 @@ internal class FinancialPdfFunction
 
             var orders = await _api.GetOrdersAsync().ToListAsync(cancellationToken);
 
-            if (orders.Count == 0) return new OkObjectResult("No orders found.");
+            if (orders.Count == 0) return new NoContentResult();
 
             using var memoryStream = new MemoryStream();
 
