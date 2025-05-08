@@ -1,17 +1,40 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../../api/AzFunApi"
 
 function PageNavigationBar() {
 
+    const key_localstorage = 'user-token';
+
+    const [navData, setNavData] = useState({
+        userAuthInputValue: undefined,
+        shouldShowAdmOptions: false
+    });
+
     useEffect(() => {
-        // TODO: set the token from the local storage to the input
-        // then add the 
+        let key = localStorage.getItem(key_localstorage);
+
+        if (!key || key.length <= 2)
+            return;
+
+        changeAuthInput(key, false)
     }, [])
 
-    const handleInputChange = () => {
-        // TODO: change the input
-        // TODO: change axios default headers
-        // TODO: change the local storage
+    const changeAuthInput = (key, updateStore = true) => {
+        if (typeof key !== "string") {
+            return;
+        }
+
+        setNavData(p => ({
+            ...p,
+            userAuthInputValue: key,
+            shouldShowAdmOptions: key.startsWith('agrobook')
+        }));
+
+        api.defaults.headers.common["x-api-key"] = key
+
+        if (updateStore)
+            localStorage.setItem(key_localstorage, key);
     }
 
     return (
@@ -29,11 +52,16 @@ function PageNavigationBar() {
                                     Catálogo
                                 </Link>
                             </li>
-                            <li class="nav-item">
-                                <Link to="/Order" className="nav-link">
-                                    Pedidos
-                                </Link>
-                            </li>
+
+                            {navData.shouldShowAdmOptions ?
+                                <>
+                                    <li class="nav-item">
+                                        <Link to="/Order" className="nav-link">
+                                            Pedidos
+                                        </Link>
+                                    </li>
+                                </> : <></>
+                            }
                         </ul>
 
                         <ul class="navbar-nav">
@@ -44,7 +72,10 @@ function PageNavigationBar() {
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <h6 class="dropdown-header mx-2">Token do usuário</h6>
-                                        <input type="password" className="form-control" placeholder="Digite o token"/>
+                                        <input type="password" className="form-control" placeholder="Digite o token"
+                                            value={navData.userAuthInputValue}
+                                            onChange={(e) => changeAuthInput(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                             </li>
