@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy dotnet core project to Azure Function App - bling-api-muchacho
+name: Build and deploy dotnet core project to Azure Function App - agrobook
 
 on:
   push:
@@ -40,3 +40,4 @@ jobs:
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3B1ACBB098AA44B123F3845AA76ED238 }}
+          sku: 'flexconsumption'
