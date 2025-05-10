@@ -29,7 +29,7 @@ internal class FinancialPdfFunction
 
     [Function("GeneratePdf")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "financial/order/pdf")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/order/pdf")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
         if (!_authService.IsAuthenticated(req))
