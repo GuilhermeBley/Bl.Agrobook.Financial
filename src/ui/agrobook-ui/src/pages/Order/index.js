@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import { postFileAsync, Status } from "./action"
+import SingleAlertComponent from "../../components/SingleAlertComponent"
 
 function Order() {
 
@@ -8,7 +9,7 @@ function Order() {
         fileToUpload: undefined,
         progressCount: 0,
         fileUploading: false,
-        uploadStatus: ''
+        uploadStatus: { success: true, message: '' }
     })
 
     const handleFileChange = (event) => {
@@ -44,16 +45,15 @@ function Order() {
                     }));
                 });
 
-            if (result.Status == Status.Ok)
-            {
-                let r = 
+            if (result.Status == Status.Ok) {
+                let r =
                     Array.isArray(result.Data)
-                    ? result.Data.length
-                    : 0;
+                        ? result.Data.length
+                        : 0;
 
                 setPageData(p => ({
                     ...p,
-                    uploadStatus: `Completo com sucesso. ${r} novos pedidos feitos.`,
+                    uploadStatus: { success: true, message: `Completo com sucesso. ${r} novos pedidos feitos.` },
                 }));
                 return;
             }
@@ -61,13 +61,13 @@ function Order() {
             let r = result.Data.Message;
             setPageData(p => ({
                 ...p,
-                uploadStatus: `Falha no processamento. Erro: ${r}.`,
+                uploadStatus: { success: false, message: `Falha no processamento. Erro: ${r}.` },
             }));
         } catch (error) {
             console.error('Error uploading file:', error);
             setPageData(p => ({
                 ...p,
-                uploadStatus: `Falha no processamento.`,
+                uploadStatus: { success: false, message: `Falha no processamento. Verifique com o administrador.` },
             }));
         } finally {
             setPageData(p => ({
@@ -80,6 +80,10 @@ function Order() {
     return (
         <>
             <PageNavigationBar />
+
+            <SingleAlertComponent 
+                message={pageData.uploadStatus.message} 
+                kind={pageData.uploadStatus.success ? 'success' : 'danger'}/>
 
             <div class="container-sm">
                 <div class="upload-container bg-white">
