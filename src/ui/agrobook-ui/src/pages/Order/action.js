@@ -1,6 +1,6 @@
 import api from "../../api/AzFunApi"
 
-export const postFileAsync = async (file) => {
+export const postFileAsync = async (file, uploadProgress = (progressEvent) => { }) => {
     try {
 
         const formData = new FormData();
@@ -12,7 +12,8 @@ export const postFileAsync = async (file) => {
             {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
+                },
+                onUploadProgress
             });
 
         if (response.status === 401) {

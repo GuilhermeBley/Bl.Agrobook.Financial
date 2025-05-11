@@ -1,12 +1,87 @@
+import { useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
+import { postFileAsync, Status } from "./action"
 
 function Order() {
+
+    const [pageData, setPageData] = useState({
+        fileToUpload: undefined,
+        progressCount: 0,
+        fileUploading: false,
+        uploadStatus: ''
+    })
+
+    const handleFileChange = (event) => {
+        setPageData(p => ({
+            ...p,
+            fileToUpload: event.target.files[0]
+        }))
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            setUploadStatus('Please select a file first');
+            return;
+        }
+
+        setPageData(p => ({
+            ...p,
+            isUploading: true,
+            uploadStatus: 'Uploading',
+            setUploadProgress: 0
+        }));
+
+        try {
+            let result = await postFileAsync(
+                pageData.fileToUpload,
+                (progressEvent) => {
+                    const progress = Math.round(
+                        (progressEvent.loaded / progressEvent.total) * 100
+                    );
+                    setPageData(p => ({
+                        ...p,
+                        progressCount: progress,
+                    }));
+                });
+
+            if (result.Status == Status.Ok)
+            {
+                let r = 
+                    Array.isArray(result.Data)
+                    ? result.Data.length
+                    : 0;
+
+                setPageData(p => ({
+                    ...p,
+                    uploadStatus: `Completo com sucesso. ${r} novos pedidos feitos.`,
+                }));
+                return;
+            }
+
+            let r = result.Data.Message;
+            setPageData(p => ({
+                ...p,
+                uploadStatus: `Falha no processamento. Erro: ${r}.`,
+            }));
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setPageData(p => ({
+                ...p,
+                uploadStatus: `Falha no processamento.`,
+            }));
+        } finally {
+            setPageData(p => ({
+                ...p,
+                isUploading: false
+            }));
+        }
+    };
 
     return (
         <>
             <PageNavigationBar />
 
-            <div class="container">
+            <div class="container-sm">
                 <div class="upload-container bg-white">
                     <div class="text-center">
                         <div class="upload-icon">
@@ -21,10 +96,15 @@ function Order() {
                     <form id="uploadForm" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="fileInput" class="form-label">Escolha o arquivo CSV</label>
-                            <input class="form-control" type="file" id="fileInput" name="file" required />
+                            <input
+                                class="form-control"
+                                type="file"
+                                required
+                                onChange={handleFileChange}
+                                disabled={pageData.isUploading} />
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="button" onClick={handleUpload} disabled={pageData.isUploading} class="btn btn-primary btn-lg">
                                 <span id="submitText">Fazer Upload</span>
                                 <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                             </button>
