@@ -20,8 +20,11 @@ function Order() {
     };
 
     const handleUpload = async () => {
-        if (!selectedFile) {
-            setUploadStatus('Please select a file first');
+        if (!pageData.fileToUpload) {
+            setPageData(p => ({
+                ...p,
+                uploadStatus: { success: false, message: `Adicione um arquivo primeiro.` },
+            }));
             return;
         }
 

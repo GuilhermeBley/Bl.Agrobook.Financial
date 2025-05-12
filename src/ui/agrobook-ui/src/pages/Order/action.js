@@ -13,7 +13,7 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
-                onUploadProgress
+                onUploadProgress: uploadProgress
             });
 
         if (response.status === 401) {
@@ -60,7 +60,7 @@ export const generatePdf = async (orderDate) => {
             };
         }
 
-        if (contentType === 'application/pdf') {
+        if (response.headers.contentType === 'application/pdf') {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             return {
                 Status: Status.Ok,
@@ -68,7 +68,7 @@ export const generatePdf = async (orderDate) => {
             };
         }
 
-        throw new Error('Unexpected response type: ' + contentType);
+        throw new Error('Unexpected response type: ' + response.headers.contentType);
     } catch (err) {
         console.error('Failed to generate PDF.', err)
         return {
