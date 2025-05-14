@@ -26,6 +26,10 @@ var host = new HostBuilder()
         {
             cfg.Key = ctx.Configuration[$"AuthOptions:Key"] ?? throw new ArgumentNullException("AuthOptions");
         });
+        services.Configure<MongoDbOptions>(cfg =>
+        {
+            cfg.ConnectionString = ctx.Configuration[$"MongoDb:ConnectionString"] ?? throw new ArgumentNullException("MongoDb");
+        });
 
 
         services.AddLogging()
