@@ -283,7 +283,7 @@ public class FinancialOrderFunction
                     GrossWeigth = 0,
                     HasStock = product.HasStock,
                     Id = 0,
-                    Image = Image.Default,
+                    Image = ImageViewModel.Default,
                     ImageUrl = string.Empty,
                     Inactive = false,
                     IsPriceEdited = true, // use the price from the CSV

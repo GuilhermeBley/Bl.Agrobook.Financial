@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace Bl.Agrobook.Financial.Func.Repositories;
 
-internal class ProductRepository : RepositoryBase
+public class ProductRepository : RepositoryBase
 {
     private const string CollectionName = "Products";
 

@@ -26,7 +26,7 @@ public class CreateCustomerOrderViewModel
     public int? Debt { get; set; }
 
     [JsonPropertyName("customer")]
-    public CustomerViewModel Customer { get; set; } = new();
+    public CustomerOrderViewModel Customer { get; set; } = new();
 
     [JsonPropertyName("deliver")]
     public bool? Deliver { get; set; }
@@ -80,7 +80,7 @@ public class CreateCustomerOrderViewModel
     public bool? PercentualSale { get; set; }
 
     [JsonPropertyName("products")]
-    public List<ProductViewModel> Products { get; set; } = new();
+    public List<CreateOrderProductViewModel> Products { get; set; } = new();
 
     [JsonPropertyName("prorated_discount")]
     public int? ProratedDiscount { get; set; }
@@ -143,7 +143,7 @@ public class AddressViewModel
     public string? Country { get; set; }
 }
 
-public class CustomerViewModel
+public class CustomerOrderViewModel
 {
     [JsonPropertyName("address")]
     public AddressViewModel Address { get; set; } = new();
@@ -164,10 +164,10 @@ public class CustomerViewModel
     public string? Ddi { get; set; }
 
     [JsonPropertyName("uid")]
-    public string? Uid { get; set; }
+    public string Uid { get; set; } = string.Empty;
 }
 
-public class ProductViewModel
+public class CreateOrderProductViewModel
 {
     [JsonPropertyName("code")]
     public string? Code { get; set; }
@@ -311,7 +311,7 @@ public class ProductViewModel
     public bool? Promotional { get; set; }
 
     [JsonPropertyName("image")]
-    public Image Image { get; set; } = Image.Default;
+    public ImageViewModel Image { get; set; } = ImageViewModel.Default;
 
     [JsonPropertyName("catalog_description")]
     public string? CatalogDescription { get; set; }

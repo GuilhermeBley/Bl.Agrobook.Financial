@@ -1,5 +1,8 @@
-﻿namespace Bl.Agrobook.Financial.Func.Model;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
+namespace Bl.Agrobook.Financial.Func.Model;
+
+[BsonIgnoreExtraElements]
 public class ProductModel
 {
     public string Code { get; set; } = string.Empty;
@@ -8,4 +11,6 @@ public class ProductModel
     public decimal? AvailableQuantity { get; set; }
     public decimal? Price { get; set; }
     public string? ImgUrl { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset InsertedAt { get; set; }
 }

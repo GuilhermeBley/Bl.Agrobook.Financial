@@ -2,9 +2,9 @@
 
 namespace Bl.Agrobook.Financial.Func.Model;
 
-public class Image
+public class ImageViewModel
 {
-    public static Image Default => new Image()
+    public static ImageViewModel Default => new ImageViewModel()
     {
         Url = string.Empty,
         Status = 3,

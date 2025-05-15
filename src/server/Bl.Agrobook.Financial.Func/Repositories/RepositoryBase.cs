@@ -6,7 +6,7 @@ using System.Xml.Xsl;
 
 namespace Bl.Agrobook.Financial.Func.Repositories;
 
-internal class RepositoryBase
+public class RepositoryBase
 {
     private const string DatabaseName = "Agrobook";
 

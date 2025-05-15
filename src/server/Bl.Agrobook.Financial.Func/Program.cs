@@ -35,6 +35,9 @@ var host = new HostBuilder()
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
+
+            .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.ProductRepository>()
+
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
