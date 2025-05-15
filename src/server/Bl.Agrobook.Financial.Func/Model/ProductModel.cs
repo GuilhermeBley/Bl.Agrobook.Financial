@@ -10,6 +10,7 @@ public class ProductModel
     public string? Description { get; set; }
     public decimal? AvailableQuantity { get; set; }
     public decimal? Price { get; set; }
+    public bool Active { get; set; }
     public string? ImgUrl { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public DateTimeOffset InsertedAt { get; set; }

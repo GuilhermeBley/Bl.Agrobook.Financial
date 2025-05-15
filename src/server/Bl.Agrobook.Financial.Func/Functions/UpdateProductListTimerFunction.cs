@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bl.Agrobook.Financial.Func.Model;
 using Bl.Agrobook.Financial.Func.Repositories;
 using Bl.Agrobook.Financial.Func.Services;
+using iText.Commons.Utils;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -73,6 +74,7 @@ public class UpdateProductListTimerFunction
         {
             Code = p.Code,
             AvailableQuantity = p.Stock,
+            Active = p.Active ?? false,
             Description = p.CatalogDescription,
             ImgUrl = p.Image.Url,
             Name = p.Description ?? string.Empty,
@@ -83,12 +85,14 @@ public class UpdateProductListTimerFunction
 
         if (productExists)
         {
+            product.Active = p.Active ?? false;
             product.AvailableQuantity = p.Stock;
             product.Description = p.CatalogDescription;
             product.ImgUrl = p.Image.Url;
             product.Name = p.Description ?? string.Empty;
             product.Price = p.Price;
             product.UpdatedAt = DateTimeOffset.UtcNow;
+            product.InsertedAt = product.InsertedAt < DateTimeOffset .UtcNow.AddYears(-100) ? DateTimeOffset.UtcNow : product.InsertedAt;
             await _productRepository.UpdateProductAsync(product, cancellationToken);
             _logger.LogInformation($"Product {product.Code} updated.");
         }
