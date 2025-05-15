@@ -71,7 +71,7 @@ public class CustomerViewModel
     public string? AddressId { get; set; }
 
     [JsonPropertyName("addresses")]
-    public List<Address> Addresses { get; set; } = new();
+    public List<AddressViewModel> Addresses { get; set; } = new();
 
     [JsonPropertyName("created_at")]
     public DateTime? CreatedAt { get; set; }

@@ -149,7 +149,7 @@ public class ProductViewModel
     public Subcategory Subcategory { get; set; } = new();
 
     [JsonPropertyName("unit")]
-    public Unit Unit { get; set; } = new();
+    public UnitViewModel Unit { get; set; } = new();
 
     [JsonPropertyName("image")]
     public Image Image { get; set; } = new();

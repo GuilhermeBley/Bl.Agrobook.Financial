@@ -26,7 +26,7 @@ public class CreateCustomerOrderViewModel
     public int? Debt { get; set; }
 
     [JsonPropertyName("customer")]
-    public Customer Customer { get; set; } = new();
+    public CustomerViewModel Customer { get; set; } = new();
 
     [JsonPropertyName("deliver")]
     public bool? Deliver { get; set; }
@@ -38,7 +38,7 @@ public class CreateCustomerOrderViewModel
     /// Default empty transporter
     /// </summary>
     [JsonPropertyName("transporter")]
-    public Transporter Transporter { get; set; } = Transporter.Empty;
+    public TransporterViewModel Transporter { get; set; } = TransporterViewModel.Empty;
 
     [JsonPropertyName("devolution")]
     public bool? Devolution { get; set; }
@@ -80,7 +80,7 @@ public class CreateCustomerOrderViewModel
     public bool? PercentualSale { get; set; }
 
     [JsonPropertyName("products")]
-    public List<Product> Products { get; set; } = new();
+    public List<ProductViewModel> Products { get; set; } = new();
 
     [JsonPropertyName("prorated_discount")]
     public int? ProratedDiscount { get; set; }
@@ -89,7 +89,7 @@ public class CreateCustomerOrderViewModel
     public int? Qty { get; set; }
 
     [JsonPropertyName("seller")]
-    public Seller Seller { get; set; } = Seller.Default;
+    public SellerViewModel Seller { get; set; } = SellerViewModel.Default;
 
     [JsonPropertyName("shopcode")]
     public string? Shopcode { get; set; }
@@ -101,7 +101,7 @@ public class CreateCustomerOrderViewModel
     /// Default empty address
     /// </summary>
     [JsonPropertyName("tax")]
-    public Tax Tax { get; set; } = Tax.Default;
+    public TaxViewModel Tax { get; set; } = TaxViewModel.Default;
 
     [JsonPropertyName("uid")]
     public string? Uid { get; set; }
@@ -110,7 +110,7 @@ public class CreateCustomerOrderViewModel
     public int? UsedCredit { get; set; }
 }
 
-public class Address
+public class AddressViewModel
 {
     [JsonPropertyName("district")]
     public string? District { get; set; }
@@ -143,10 +143,10 @@ public class Address
     public string? Country { get; set; }
 }
 
-public class Customer
+public class CustomerViewModel
 {
     [JsonPropertyName("address")]
-    public Address Address { get; set; } = new();
+    public AddressViewModel Address { get; set; } = new();
 
     [JsonPropertyName("document")]
     public string? Document { get; set; }
@@ -167,7 +167,7 @@ public class Customer
     public string? Uid { get; set; }
 }
 
-public class Product
+public class ProductViewModel
 {
     [JsonPropertyName("code")]
     public string? Code { get; set; }
@@ -236,16 +236,16 @@ public class Product
     /// Default empty tax
     /// </summary>
     [JsonPropertyName("tax")]
-    public Tax Tax { get; set; } = Tax.Default;
+    public TaxViewModel Tax { get; set; } = TaxViewModel.Default;
 
     [JsonPropertyName("tax_details")]
-    public TaxDetails TaxDetails { get; set; } = new();
+    public TaxDetailsViewModel TaxDetails { get; set; } = new();
 
     [JsonPropertyName("category")]
     public Category Category { get; set; } = new();
 
     [JsonPropertyName("unit")]
-    public Unit Unit { get; set; } = new();
+    public UnitViewModel Unit { get; set; } = new();
 
     [JsonPropertyName("code_extra")]
     public string? CodeExtra { get; set; }
@@ -368,9 +368,9 @@ public class Product
     public bool? IsPriceEdited { get; set; }
 }
 
-public class Seller
+public class SellerViewModel
 {
-    public static Seller Default => new Seller()
+    public static SellerViewModel Default => new SellerViewModel()
     {
         Uid = "1255C06C-C3A5-470A-A0C1-205C230B53C7",
         Name = "MIGUEL OLIVEIRA",
@@ -387,9 +387,9 @@ public class Seller
     public string? Username { get; set; }
 }
 
-public class Tax
+public class TaxViewModel
 {
-    public static Tax Default => new Tax()
+    public static TaxViewModel Default => new TaxViewModel()
     {
         Included = 0,
         ToInclude = 0,
@@ -410,13 +410,13 @@ public class Tax
     public int? ExemptValue { get; set; }
 }
 
-public class TaxDetails
+public class TaxDetailsViewModel
 {
 }
 
-public class Transporter
+public class TransporterViewModel
 {
-    public static Transporter Empty => new Transporter()
+    public static TransporterViewModel Empty => new TransporterViewModel()
     {
         Brand = string.Empty,
         GrossWeight = 0,
@@ -449,6 +449,6 @@ public class Transporter
     public string? Specie { get; set; }
 }
 
-public class Unit
+public class UnitViewModel
 {
 }

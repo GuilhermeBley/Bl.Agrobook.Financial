@@ -95,7 +95,7 @@ public class SaleHistoryViewModel
     public decimal? DeliveryTax { get; set; }
 
     [JsonPropertyName("seller")]
-    public Seller Seller { get; set; } = new();
+    public SellerViewModel Seller { get; set; } = new();
 
     [JsonPropertyName("origin")]
     public int? Origin { get; set; }
@@ -155,7 +155,7 @@ public class SaleHistoryViewModel
     public decimal? Change { get; set; }
 
     [JsonPropertyName("customer")]
-    public Customer Customer { get; set; } = new();
+    public CustomerViewModel Customer { get; set; } = new();
 
     [JsonPropertyName("products")]
     public List<SaleProduct> Products { get; set; } = new();
