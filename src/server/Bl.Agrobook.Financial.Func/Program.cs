@@ -26,11 +26,18 @@ var host = new HostBuilder()
         {
             cfg.Key = ctx.Configuration[$"AuthOptions:Key"] ?? throw new ArgumentNullException("AuthOptions");
         });
+        services.Configure<MongoDbOptions>(cfg =>
+        {
+            cfg.ConnectionString = ctx.Configuration[$"MongoDb:ConnectionString"] ?? throw new ArgumentNullException("MongoDb");
+        });
 
 
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
+
+            .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.ProductRepository>()
+
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()

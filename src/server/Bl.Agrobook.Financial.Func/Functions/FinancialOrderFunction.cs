@@ -219,11 +219,11 @@ public class FinancialOrderFunction
                         Products = new(),
                         ProratedDiscount = 0,
                         Qty = 0,
-                        Seller = Seller.Default,
+                        Seller = SellerViewModel.Default,
                         Shopcode = customer.Shopcode,
                         Status = 3,
-                        Tax = Tax.Default,
-                        Transporter = Transporter.Empty,
+                        Tax = TaxViewModel.Default,
+                        Transporter = TransporterViewModel.Empty,
                         Uid = Guid.NewGuid().ToString(),
                         UsedCredit = 0,
                         Customer = new()
@@ -254,7 +254,7 @@ public class FinancialOrderFunction
                 o.Products.Add(new()
                 {
                     Uid = product.Uid,
-                    Tax = Tax.Default,
+                    Tax = TaxViewModel.Default,
                     Shopcode = product.Shopcode,
                     Active = true,
                     AutoPrice = false,
@@ -283,7 +283,7 @@ public class FinancialOrderFunction
                     GrossWeigth = 0,
                     HasStock = product.HasStock,
                     Id = 0,
-                    Image = Image.Default,
+                    Image = ImageViewModel.Default,
                     ImageUrl = string.Empty,
                     Inactive = false,
                     IsPriceEdited = true, // use the price from the CSV

@@ -1,7 +1,12 @@
+import { useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import ProductCardItem from "../../components/ProductCardItem"
 
 function Home() {
+    const [pageData, setPageData] = useState({
+        items: []
+    })
+    
     return (
         <>
             <PageNavigationBar />
@@ -83,7 +88,14 @@ function Home() {
 
                         <div class="row">
                             <div class="col-md-4 mb-4">
-                                <ProductCardItem/>
+                                {pageData.items.forEach(i => {
+                                    return <>
+                                        <ProductCardItem 
+                                            description={i.description}
+                                            quantity={i.quantity}
+                                            title={i.title}/>
+                                    </>
+                                })}
                             </div>
                         </div>
 
