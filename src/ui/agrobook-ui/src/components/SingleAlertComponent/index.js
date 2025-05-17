@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const FloatingError = ({ message, kind = 'danger', timeout = 5000, onClose }) => {
+const FloatingError = ({ message, kind = 'danger', timeout = undefined, onClose }) => {
   const [show, setShow] = useState(!!message);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const FloatingError = ({ message, kind = 'danger', timeout = 5000, onClose }) =>
       <div className={`alert ${alertClass} alert-dismissible fade show d-flex align-items-center`} role="alert">
         <span className="me-2" style={{ fontSize: '1.2rem' }}>{icon}</span>
         <div>
-          <strong>{kind.charAt(0).toUpperCase() + kind.slice(1)}!</strong> {message}
+          <strong>{kind.charAt(0).toUpperCase()}!</strong> {message}
         </div>
         <button 
           type="button" 

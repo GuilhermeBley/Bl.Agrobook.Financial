@@ -11,7 +11,7 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
             formData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 onUploadProgress: uploadProgress
             });
