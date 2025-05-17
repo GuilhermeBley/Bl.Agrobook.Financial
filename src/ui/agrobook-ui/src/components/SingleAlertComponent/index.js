@@ -38,7 +38,7 @@ const FloatingError = ({ message, kind = 'danger', timeout = undefined, onClose 
       <div className={`alert ${alertClass} alert-dismissible fade show d-flex align-items-center`} role="alert">
         <span className="me-2" style={{ fontSize: '1.2rem' }}>{icon}</span>
         <div>
-          <strong>{kind.charAt(0).toUpperCase()}!</strong> {message}
+          <strong> </strong> {message}
         </div>
         <button 
           type="button" 

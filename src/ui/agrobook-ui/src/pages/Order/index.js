@@ -11,7 +11,7 @@ function Order() {
         fileUploading: false,
         isDowloadingPdf: false,
         currentPdfDate: '',
-        alertMessage: { success: true, message: '' }
+        alertMessage: { success: true, message: '', timeout: undefined }
     })
 
     const handleFileChange = (event) => {
@@ -97,7 +97,7 @@ function Order() {
 
             if (pdfResult.Status == Status.NoData) {
                 setPageData(p => ({
-                    alertMessage: { success: true, message: "Nenhum pedido em aberto." }
+                    alertMessage: { success: true, message: "Nenhum pedido em aberto.", timeout: 5000 }
                 }))
             }
 
@@ -140,7 +140,8 @@ function Order() {
 
             <SingleAlertComponent
                 message={pageData.alertMessage.message}
-                kind={pageData.alertMessage.success ? 'success' : 'danger'} />
+                kind={pageData.alertMessage.success ? 'success' : 'danger'} 
+                timeout={pageData.alertMessage.timeout}/>
 
             <div class="container-sm">
                 <div class="upload-container bg-white">

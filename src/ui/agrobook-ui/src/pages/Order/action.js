@@ -60,6 +60,13 @@ export const generatePdf = async (orderDate) => {
             };
         }
 
+        if (response.status === 204){
+            return {
+                Status: Status.NoData,
+                Data: undefined
+            }
+        }
+
         if (response.headers.contentType === 'application/pdf') {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             return {
