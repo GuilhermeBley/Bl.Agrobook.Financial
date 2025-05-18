@@ -2,19 +2,42 @@ import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import ProductCardItem from "../../components/ProductCardItem"
 import { PaginableList } from "../../utils/PaginableList"
+import { getProducts, Status } from "./actions";
 
 function Home() {
     const [pageData, setPageData] = useState({
         allItems: [],
-        items: new PaginableList([], 9)
+        items: new PaginableList([], 9),
+        alertMessage: { success: true, message: '', timeout: undefined }
     })
 
     useEffect(
         () => {
 
-            
+            const populateProducts = async () => {
+                let prodResult = await getProducts();
 
-        },[])
+                if (prodResult.Status !== Status.Ok) {
+                    console.log('Failed to get products.', prodResult.Result)
+                    setPageData(p => ({
+                        ...p,
+                        alertMessage: { message: "Falha ao coletar dados dos produtos.", success: false, timeout: undefined }
+                    }))
+                    return;
+                }
+
+                setPageData(p => {
+
+                    return ({
+                        ...p,
+                        allItems: prodResult.Result
+                    })
+                })
+            };
+
+            populateProducts();
+
+        }, [])
 
     return (
         <>
@@ -93,8 +116,8 @@ function Home() {
                                     return <>
                                         <ProductCardItem
                                             description={i.description}
-                                            quantity={i.quantity}
-                                            title={i.title} />
+                                            quantity={i.availableQuantity}
+                                            title={i.name} />
                                     </>
                                 })}
                             </div>
