@@ -23,15 +23,24 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
             };
         }
 
+        console.log('Response: ' + response.status)
+
+        if (response.status === 400) {
+            return {
+                Status: Status.Failed,
+                Data: response.data.message
+            }
+        }
+
         const result = await response.json();
-        
+
         return {
             Status: Status.Ok,
             Data: result
         };
     } catch (err) {
         console.error('Failed to generate orders.', err)
-        
+
         return {
             Status: Status.Failed,
             Data: "Falha ao processar."
@@ -60,14 +69,14 @@ export const generatePdf = async (orderDate) => {
             };
         }
 
-        if (response.status === 204){
+        if (response.status === 204) {
             return {
                 Status: Status.NoData,
                 Data: undefined
             }
         }
 
-        if (response.headers.contentType === 'application/pdf') {
+        if (response.status === 200) {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             return {
                 Status: Status.Ok,
