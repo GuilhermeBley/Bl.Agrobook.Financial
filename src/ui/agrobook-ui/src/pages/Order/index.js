@@ -10,7 +10,7 @@ function Order() {
         progressCount: 0,
         fileUploading: false,
         isDowloadingPdf: false,
-        currentPdfDate: '',
+        currentPdfDate: undefined,
         alertMessage: { success: true, message: '', timeout: undefined }
     })
 
@@ -105,7 +105,10 @@ function Order() {
                 return;
             }
 
-            downloadBlob(pdfResult.Data, 'Pedidos.pdf');
+            if (pageData.currentPdfDate instanceof Date)
+                downloadBlob(pdfResult.Data, `Pedidos-${pageData.currentPdfDate.toISOString().split('T')[0]}.pdf`);
+            else
+                downloadBlob(pdfResult.Data, `Pedidos.pdf`);
 
         } finally {
 
@@ -134,14 +137,25 @@ function Order() {
         }, 100);
     };
 
+    const handleOrderDateChange = (e) => {
+        let v = e.target.value;
+
+        let date = new Date(v);
+
+        setPageData(p => ({
+            ...p,
+            currentPdfDate: date
+        }))
+    }
+
     return (
         <>
             <PageNavigationBar />
 
             <SingleAlertComponent
                 message={pageData.alertMessage.message}
-                kind={pageData.alertMessage.success ? 'success' : 'danger'} 
-                timeout={pageData.alertMessage.timeout}/>
+                kind={pageData.alertMessage.success ? 'success' : 'danger'}
+                timeout={pageData.alertMessage.timeout} />
 
             <div class="container-sm">
                 <div class="upload-container bg-white">
@@ -171,14 +185,20 @@ function Order() {
                                 <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                             </button>
 
-                            <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg">
-                                <span id="submitText">Fazer download do PDF</span>
-                                <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                            </button>
                         </div>
                     </form>
+
+                    <div className="mt-3">
+                        <label for="ordersDateInput">Data pedido</label>
+                        <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." onChange={handleOrderDateChange}/>
+                        <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
+                            <span id="submitText">Fazer download do PDF</span>
+                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
+
         </>
     );
 }
