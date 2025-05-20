@@ -63,12 +63,12 @@ function Order() {
                 return;
             }
 
-            let r = result.Data.Message;
+            let r = result.Data;
             setPageData(p => ({
                 ...p,
                 alertMessage: {
                     success: false,
-                    message: r ? `Falha no processamento. Erro: ${r}.` : 'Falha no processamento.'
+                    message: r ? `Falha no processamento. ${r}.` : 'Falha no processamento.'
                 },
             }));
         } catch (error) {

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import api from "../../api/AzFunApi"
 
 export const postFileAsync = async (file, uploadProgress = (progressEvent) => { }) => {
@@ -16,22 +17,6 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
                 onUploadProgress: uploadProgress
             });
 
-        if (response.status === 401) {
-            return {
-                Status: Status.Unauthorized,
-                Data: undefined
-            };
-        }
-
-        console.log('Response: ' + response.status)
-
-        if (response.status === 400) {
-            return {
-                Status: Status.Failed,
-                Data: response.data.message
-            }
-        }
-
         const result = await response.json();
 
         return {
@@ -40,6 +25,23 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
         };
     } catch (err) {
         console.error('Failed to generate orders.', err)
+
+        if (err instanceof AxiosError) {
+
+            if (err.code?.status === 401) {
+                return {
+                    Status: Status.Unauthorized,
+                    Data: undefined
+                };
+            }
+
+            if (err.code?.status === 400) {
+                return {
+                    Status: Status.Failed,
+                    Data: err.response.data.message
+                }
+            }
+        }
 
         return {
             Status: Status.Failed,
@@ -56,7 +58,7 @@ export const generatePdf = async (orderDate) => {
             let year = orderDate.getFullYear(); // yyyy
             orderDate = `${day}/${month}/${year}`;
         }
-        else{
+        else {
             orderDate = undefined
         }
 
