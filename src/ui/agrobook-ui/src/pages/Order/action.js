@@ -49,7 +49,7 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
 export const generatePdf = async (orderDate) => {
     try {
         if (orderDate instanceof Date) {
-            let day = String(orderDate.getDate()).padStart(2, '0'); // dd
+            let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
             let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
             let year = orderDate.getFullYear(); // yyyy
             orderDate = `${day}/${month}/${year}`;
