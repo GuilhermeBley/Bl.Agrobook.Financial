@@ -17,31 +17,27 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
                 onUploadProgress: uploadProgress
             });
 
-        const result = await response.json();
+
+        if (response.status === 401) {
+            return {
+                Status: Status.Unauthorized,
+                Data: undefined
+            };
+        }
+
+        if (response.status === 400) {
+            return {
+                Status: Status.Failed,
+                Data: response.data.message
+            }
+        }
 
         return {
             Status: Status.Ok,
-            Data: result
+            Data: response.data
         };
     } catch (err) {
         console.error('Failed to generate orders.', err)
-
-        if (err instanceof AxiosError) {
-
-            if (err.code?.status === 401) {
-                return {
-                    Status: Status.Unauthorized,
-                    Data: undefined
-                };
-            }
-
-            if (err.code?.status === 400) {
-                return {
-                    Status: Status.Failed,
-                    Data: err.response.data.message
-                }
-            }
-        }
 
         return {
             Status: Status.Failed,
