@@ -29,7 +29,6 @@ function Home() {
                 console.log("updating prod list");
                 setPageData(p => {
                     p.items.UpdateItems(prodResult.Result)
-                    console.log(p.items.CurrentShowedItems)
                     return ({
                         ...p,
                         allItems: prodResult.Result
@@ -114,13 +113,13 @@ function Home() {
 
                         <div className="row">
                             <div className="col-md-4 mb-4">
-                                {pageData.allItems.forEach(i => {
-                                    return <>
+                                {pageData.items.CurrentShowedItems.map((i, index) => {
+                                    return <div key={index}>
                                         <ProductCardItem
                                             description={i.description}
                                             quantity={i.availableQuantity}
                                             title={i.name} />
-                                    </>
+                                    </div>
                                 })}
                             </div>
                         </div>
