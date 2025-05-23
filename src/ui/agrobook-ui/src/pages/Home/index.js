@@ -112,7 +112,7 @@ function Home() {
                         </div>
 
                         <div className="row">
-                            <div className="col-md-4 mb-4">
+                            <div className="col-sm-4 mb-3">
                                 {pageData.items.CurrentShowedItems.map((i, index) => {
                                     return <div key={index}>
                                         <ProductCardItem
