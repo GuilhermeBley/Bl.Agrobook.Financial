@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
-import { postFileAsync, Status } from "./action"
+import { postFileAsync, Status, generatePdf } from "./action"
 import SingleAlertComponent from "../../components/SingleAlertComponent"
 
 function Order() {
@@ -9,7 +9,9 @@ function Order() {
         fileToUpload: undefined,
         progressCount: 0,
         fileUploading: false,
-        uploadStatus: { success: true, message: '' }
+        isDowloadingPdf: false,
+        currentPdfDate: undefined,
+        alertMessage: { success: true, message: '', timeout: undefined }
     })
 
     const handleFileChange = (event) => {
@@ -23,7 +25,7 @@ function Order() {
         if (!pageData.fileToUpload) {
             setPageData(p => ({
                 ...p,
-                uploadStatus: { success: false, message: `Adicione um arquivo primeiro.` },
+                alertMessage: { success: false, message: `Adicione um arquivo primeiro.` },
             }));
             return;
         }
@@ -31,7 +33,7 @@ function Order() {
         setPageData(p => ({
             ...p,
             isUploading: true,
-            uploadStatus: 'Uploading',
+            alertMessage: 'Uploading',
             setUploadProgress: 0
         }));
 
@@ -56,21 +58,24 @@ function Order() {
 
                 setPageData(p => ({
                     ...p,
-                    uploadStatus: { success: true, message: `Completo com sucesso. ${r} novos pedidos feitos.` },
+                    alertMessage: { success: true, message: `Completo com sucesso. ${r} novos pedidos feitos.` },
                 }));
                 return;
             }
 
-            let r = result.Data.Message;
+            let r = result.Data;
             setPageData(p => ({
                 ...p,
-                uploadStatus: { success: false, message: `Falha no processamento. Erro: ${r}.` },
+                alertMessage: {
+                    success: false,
+                    message: r ? `Falha no processamento. ${r}.` : 'Falha no processamento.'
+                },
             }));
         } catch (error) {
             console.error('Error uploading file:', error);
             setPageData(p => ({
                 ...p,
-                uploadStatus: { success: false, message: `Falha no processamento. Verifique com o administrador.` },
+                alertMessage: { success: false, message: `Falha no processamento. Verifique com o administrador.` },
             }));
         } finally {
             setPageData(p => ({
@@ -80,13 +85,77 @@ function Order() {
         }
     };
 
+    const handlePdfGeneration = async () => {
+        try {
+
+            setPageData(p => ({
+                ...p,
+                isDowloadingPdf: true
+            }))
+
+            let pdfResult = await generatePdf(pageData.currentPdfDate)
+
+            if (pdfResult.Status == Status.NoData) {
+                setPageData(p => ({
+                    alertMessage: { success: true, message: "Nenhum pedido em aberto.", timeout: 5000 }
+                }))
+            }
+
+            if (!(pdfResult.Data instanceof Blob)) {
+                return;
+            }
+
+            if (pageData.currentPdfDate instanceof Date)
+                downloadBlob(pdfResult.Data, `Pedidos-${pageData.currentPdfDate.toISOString().split('T')[0]}.pdf`);
+            else
+                downloadBlob(pdfResult.Data, `Pedidos.pdf`);
+
+        } finally {
+
+            setPageData(p => ({
+                ...p,
+                isDowloadingPdf: false
+            }))
+        }
+    }
+
+    const downloadBlob = (blob, filename) => {
+        // Create a temporary URL for the blob
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'download';
+        a.target = "_blank"
+
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+    };
+
+    const handleOrderDateChange = (e) => {
+        let v = e.target.value;
+
+        let date = new Date(v);
+
+        setPageData(p => ({
+            ...p,
+            currentPdfDate: date
+        }))
+    }
+
     return (
         <>
             <PageNavigationBar />
 
-            <SingleAlertComponent 
-                message={pageData.uploadStatus.message} 
-                kind={pageData.uploadStatus.success ? 'success' : 'danger'}/>
+            <SingleAlertComponent
+                message={pageData.alertMessage.message}
+                kind={pageData.alertMessage.success ? 'success' : 'danger'}
+                timeout={pageData.alertMessage.timeout} />
 
             <div class="container-sm">
                 <div class="upload-container bg-white">
@@ -110,15 +179,26 @@ function Order() {
                                 onChange={handleFileChange}
                                 disabled={pageData.isUploading} />
                         </div>
-                        <div class="d-grid gap-2">
+                        <div class="d-grid gap-2 d-flex">
                             <button type="button" onClick={handleUpload} disabled={pageData.isUploading} class="btn btn-primary btn-lg">
                                 <span id="submitText">Fazer Upload</span>
                                 <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                             </button>
+
                         </div>
                     </form>
+
+                    <div className="mt-3">
+                        <label for="ordersDateInput">Data pedido</label>
+                        <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." onChange={handleOrderDateChange}/>
+                        <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
+                            <span id="submitText">Fazer download do PDF</span>
+                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
+
         </>
     );
 }

@@ -4,28 +4,28 @@ using Bl.Agrobook.Financial.Func.Model;
 using Bl.Agrobook.Financial.Func.Repositories;
 using Bl.Agrobook.Financial.Func.Services;
 using iText.Commons.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace Bl.Agrobook.Financial.Func.Functions;
 
-public class UpdateProductListTimerFunction
+public class UpdateProductListHttpFunction
 {
-#if DEBUG
-    public const bool ExecuteOnStartup = false;
-#else
-    public const bool ExecuteOnStartup = false;
-#endif
-
+    private readonly AuthService _authService;
     private readonly ILogger _logger;
     private readonly FinancialApiService _financialApiService;
     private readonly ProductRepository _productRepository;
 
-    public UpdateProductListTimerFunction(
+    public UpdateProductListHttpFunction(
         ILoggerFactory loggerFactory,
+        AuthService authService,
         FinancialApiService financialApiService,
         ProductRepository productRepository)
     {
+        _authService = authService;
         _logger = loggerFactory.CreateLogger<UpdateProductListTimerFunction>();
         _financialApiService = financialApiService;
         _productRepository = productRepository;
@@ -33,10 +33,15 @@ public class UpdateProductListTimerFunction
     }
 
     [Function("UpdateProductListTimerFunction")]
-    public async Task Run(
-        [TimerTrigger("0 0 18 * * *", RunOnStartup = ExecuteOnStartup)] /*Update for each five minutes*/ TimerInfo myTimer,
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "/products/update-all")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
+        if (!_authService.IsAuthenticated(req))
+        {
+            return new UnauthorizedResult();
+        }
+
         var start = DateTime.Now;
 
         try
@@ -47,6 +52,10 @@ public class UpdateProductListTimerFunction
                 {
                     await AddOrUpdateProductAsync(p, cancellationToken);
                 }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
                 catch (Exception e)
                 {
                     _logger.LogError(e, $"Error occurred while processing product {p.Code}.");
@@ -54,14 +63,24 @@ public class UpdateProductListTimerFunction
                 }
             }
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Operation was cancelled while updating product list.");
+        }
         catch (Exception e)
         {
             _logger.LogError(e, "Error occurred while updating product list.");
+            return new BadRequestObjectResult(new
+            {
+                Message = "Falha em executar operações."
+            });
         }
         finally
         {
-            _logger.LogInformation($"UpdateProductList Timer trigger function ended up in {(DateTime.Now - start).TotalSeconds} seconds.");
+            _logger.LogInformation($"UpdateProductList function ended up in {(DateTime.Now - start).TotalSeconds} seconds.");
         }
+
+        return new OkResult();
     }
 
     private async Task AddOrUpdateProductAsync(ProductViewModel p, CancellationToken cancellationToken = default)

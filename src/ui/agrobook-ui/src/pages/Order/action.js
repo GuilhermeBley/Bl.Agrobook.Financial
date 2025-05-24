@@ -11,10 +11,11 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
             formData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 onUploadProgress: uploadProgress
             });
+
 
         if (response.status === 401) {
             return {
@@ -23,15 +24,20 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
             };
         }
 
-        const result = await response.json();
-        
+        if (response.status === 400) {
+            return {
+                Status: Status.Failed,
+                Data: response.data.message
+            }
+        }
+
         return {
             Status: Status.Ok,
-            Data: result
+            Data: response.data
         };
     } catch (err) {
         console.error('Failed to generate orders.', err)
-        
+
         return {
             Status: Status.Failed,
             Data: "Falha ao processar."
@@ -41,6 +47,16 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
 
 export const generatePdf = async (orderDate) => {
     try {
+        if (orderDate instanceof Date) {
+            let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
+            let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
+            let year = orderDate.getFullYear(); // yyyy
+            orderDate = `${day}/${month}/${year}`;
+        }
+        else {
+            orderDate = undefined
+        }
+
         const response = await api.post(
             'api/financial/order/pdf',
             {
@@ -60,7 +76,14 @@ export const generatePdf = async (orderDate) => {
             };
         }
 
-        if (response.headers.contentType === 'application/pdf') {
+        if (response.status === 204) {
+            return {
+                Status: Status.NoData,
+                Data: undefined
+            }
+        }
+
+        if (response.status === 200) {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             return {
                 Status: Status.Ok,
