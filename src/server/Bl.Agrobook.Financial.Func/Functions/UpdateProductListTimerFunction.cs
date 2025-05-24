@@ -34,7 +34,7 @@ public class UpdateProductListTimerFunction
 
     [Function("UpdateProductListTimerFunction")]
     public async Task Run(
-        [TimerTrigger("0 */5 * * * *", RunOnStartup = ExecuteOnStartup)] /*Update for each five minutes*/ TimerInfo myTimer,
+        [TimerTrigger("0 0 18 * * *", RunOnStartup = ExecuteOnStartup)] /*Update for each five minutes*/ TimerInfo myTimer,
         CancellationToken cancellationToken = default)
     {
         var start = DateTime.Now;
