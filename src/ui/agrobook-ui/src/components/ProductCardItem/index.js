@@ -22,7 +22,7 @@ function ProductCardItem({ title, quantity, description, onItemChanged = (qtty) 
     return (
         <>
             <div class="card h-100">
-                <img src="oliveira-flores512.jpg" class="card-img-top" alt="Product 1" width="512" height="250" />
+                <img src="oliveira-flores512.jpg" class="card-img-top" alt="Product 1" width="450" height="250" />
                 <div class="card-body">
                     <h5 class="card-title">{title}</h5>
                     <div class="rating mb-2">
@@ -31,7 +31,12 @@ function ProductCardItem({ title, quantity, description, onItemChanged = (qtty) 
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star-half-alt"></i>
-                        <span class="text-muted ms-1">({quantity})</span>
+                        <span class="text-muted ms-1">
+                            {quantity > 0 || quantity <= 0
+                            ? <>({quantity})</>
+                            : <></>}
+                            
+                        </span>
                     </div>
                     <p class="card-text">{description}</p>
                     <div class="d-flex justify-content-end align-items-end text-end">

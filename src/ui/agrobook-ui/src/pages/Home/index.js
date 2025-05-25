@@ -112,16 +112,14 @@ function Home() {
                         </div>
 
                         <div className="row">
-                            <div className="col-sm-4 mb-3">
-                                {pageData.items.CurrentShowedItems.map((i, index) => {
-                                    return <div key={index}>
-                                        <ProductCardItem
-                                            description={i.description}
-                                            quantity={i.availableQuantity}
-                                            title={i.name} />
-                                    </div>
-                                })}
-                            </div>
+                            {pageData.items.CurrentShowedItems.map((i, index) => {
+                                return <div className="col-sm-4 mb-3" key={index}>
+                                    <ProductCardItem
+                                        description={i.description}
+                                        quantity={undefined}
+                                        title={i.name} />
+                                </div>
+                            })}
                         </div>
 
                         {pageData.items.TotalPageQuantity > 1
