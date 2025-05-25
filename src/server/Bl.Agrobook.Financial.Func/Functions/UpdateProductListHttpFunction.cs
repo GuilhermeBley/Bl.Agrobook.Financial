@@ -34,7 +34,7 @@ public class UpdateProductListHttpFunction
 
     [Function("UpdateProductListHttpFunction")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "/products/update-all")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "products/update-all")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
         if (!_authService.IsAuthenticated(req))
