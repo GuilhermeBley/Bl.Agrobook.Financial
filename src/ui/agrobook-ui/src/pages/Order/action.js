@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import api from "../../api/AzFunApi"
 
 export const postFileAsync = async (file, uploadProgress = (progressEvent) => { }) => {
