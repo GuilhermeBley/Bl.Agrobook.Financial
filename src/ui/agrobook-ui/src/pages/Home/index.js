@@ -51,7 +51,7 @@ function Home() {
                             <div className="card-body">
                                 <h5 className="card-title">Meus pedidos</h5>
 
-                                <div className="border rounded p-2" style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
+                                <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
                                     <ul className="list-group">
                                         <li className="list-group-item d-flex justify-content-between align-items-center">
                                             <div>
