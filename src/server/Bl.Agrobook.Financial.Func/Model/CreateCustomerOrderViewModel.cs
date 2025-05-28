@@ -359,7 +359,7 @@ public class CreateOrderProductViewModel
     public bool? NoTax { get; set; }
 
     [JsonPropertyName("tax_use_global")]
-    public bool? TaxUseGlobal { get; set; }
+    public bool? TaxUseGlobal { get; set; } 
 
     [JsonPropertyName("cartUid")]
     public string? CartUid { get; set; }
