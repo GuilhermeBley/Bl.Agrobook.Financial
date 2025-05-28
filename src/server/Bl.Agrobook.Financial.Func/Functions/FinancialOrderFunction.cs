@@ -221,7 +221,7 @@ public class FinancialOrderFunction
                         Qty = 0,
                         Seller = SellerViewModel.Default,
                         Shopcode = customer.Shopcode,
-                        Status = 3,
+                        Status = 1,
                         Tax = TaxViewModel.Default,
                         Transporter = TransporterViewModel.Empty,
                         Uid = Guid.NewGuid().ToString(),
@@ -250,7 +250,7 @@ public class FinancialOrderFunction
                     var obss = new string?[] { o.Obs?.Trim('.'), order.ObsPedido.Trim(' ', '.', ',', '\n') + "." };
                     o.Obs = string.Join(", ", obss.Where(e => !string.IsNullOrEmpty(e)));
                 }
-                
+
                 o.Products.Add(new()
                 {
                     Uid = product.Uid,
@@ -282,7 +282,7 @@ public class FinancialOrderFunction
                     FractionalSale = false,
                     GrossWeigth = 0,
                     HasStock = product.HasStock,
-                    Id = 0,
+                    Id = product.Id,
                     Image = ImageViewModel.Default,
                     ImageUrl = string.Empty,
                     Inactive = false,
@@ -300,7 +300,7 @@ public class FinancialOrderFunction
                     ProfitMargin = 0,
                     Promotional = false,
                     ProratedDiscount = 0,
-                    Published = false,
+                    Published = true,
                     Qty = order.Quantity,
                     ReservedStock = product.ReservedStock,
                     Stock = product.Stock,
@@ -310,7 +310,7 @@ public class FinancialOrderFunction
                     Subcategory = product.Subcategory,
                     Suppliers = new(),
                     TaxDetails = new(),
-                    TaxUseGlobal = false,
+                    TaxUseGlobal = true,
                     Unit = product.Unit,
                     UnitPrice = 0,
 

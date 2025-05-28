@@ -46,50 +46,58 @@ function Home() {
 
             <div className="container">
                 <div className="row">
-                    <div className="col-lg-3 mb-4">
-                        <div className="card category-filter">
+                    <div className="col-lg-4 mb-4">
+                        <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title">Meus pedidos</h5>
 
-                                <h6 className="mt-4">Categories</h6>
-                                <div className="list-group list-group-flush">
-                                    <a href="#" className="list-group-item list-group-item-action active">All Products</a>
-                                    <a href="#" className="list-group-item list-group-item-action">Electronics</a>
-                                    <a href="#" className="list-group-item list-group-item-action">Clothing</a>
-                                    <a href="#" className="list-group-item list-group-item-action">Home & Garden</a>
-                                    <a href="#" className="list-group-item list-group-item-action">Sports</a>
+                                <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
+                                    <ul className="list-group">
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Produto 1
+                                                <span className="badge bg-primary rounded-pill ms-2">3</span>
+                                            </div>
+                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Produto 2
+                                                <span className="badge bg-primary rounded-pill ms-2">1</span>
+                                            </div>
+                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Produto 3
+                                                <span className="badge bg-primary rounded-pill ms-2">2</span>
+                                            </div>
+                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Produto 4
+                                                <span className="badge bg-primary rounded-pill ms-2">5</span>
+                                            </div>
+                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Produto 5
+                                                <span className="badge bg-primary rounded-pill ms-2">1</span>
+                                            </div>
+                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                        </li>
+                                    </ul>
                                 </div>
 
-                                <h6 className="mt-4">Price Range</h6>
-                                <div className="range-slider mt-2">
-                                    <input type="range" className="form-range" min="0" max="1000" step="10" id="priceRange" />
-                                    <div className="d-flex justify-content-between">
-                                        <span>$0</span>
-                                        <span>$1000</span>
-                                    </div>
-                                </div>
-
-                                <h6 className="mt-4">Brand</h6>
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="brand1" />
-                                    <label className="form-check-label" for="brand1">Brand A</label>
-                                </div>
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="brand2" />
-                                    <label className="form-check-label" for="brand2">Brand B</label>
-                                </div>
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="brand3" />
-                                    <label className="form-check-label" for="brand3">Brand C</label>
-                                </div>
-
-                                <button className="btn btn-primary w-100 mt-3">Apply Filters</button>
-                                <button className="btn btn-outline-secondary w-100 mt-2">Reset</button>
+                                <button className="btn btn-primary w-100 mt-3">Finalizar pedido</button>
+                                <button className="btn btn-outline-secondary w-100 mt-2">Limpar</button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="col-lg-9">
+                    <div className="col-lg-8">
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <div className="input-group">
@@ -112,16 +120,14 @@ function Home() {
                         </div>
 
                         <div className="row">
-                            <div className="col-sm-4 mb-3">
-                                {pageData.items.CurrentShowedItems.map((i, index) => {
-                                    return <div key={index}>
-                                        <ProductCardItem
-                                            description={i.description}
-                                            quantity={i.availableQuantity}
-                                            title={i.name} />
-                                    </div>
-                                })}
-                            </div>
+                            {pageData.items.CurrentShowedItems.map((i, index) => {
+                                return <div className="col-sm-4 mb-3" key={index}>
+                                    <ProductCardItem
+                                        description={i.description}
+                                        quantity={undefined}
+                                        title={i.name} />
+                                </div>
+                            })}
                         </div>
 
                         {pageData.items.TotalPageQuantity > 1
