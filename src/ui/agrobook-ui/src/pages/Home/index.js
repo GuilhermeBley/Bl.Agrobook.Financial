@@ -7,6 +7,7 @@ import { getProducts, Status } from "./action";
 function Home() {
     const [pageData, setPageData] = useState({
         allItems: [],
+        cartItems: [],
         items: new PaginableList([], 9),
         alertMessage: { success: true, message: '', timeout: undefined }
     })
@@ -53,6 +54,17 @@ function Home() {
 
                                 <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
                                     <ul className="list-group">
+
+                                        {pageData.cartItems.map((cartItem, i) => <>
+                                            <li className="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {cartItem.product.name}
+                                                    <span className="badge bg-primary rounded-pill ms-2">{cartItem.product.qtt}</span>
+                                                </div>
+                                                <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                            </li>
+                                        </>)}
+
                                         <li className="list-group-item d-flex justify-content-between align-items-center">
                                             <div>
                                                 Produto 1
