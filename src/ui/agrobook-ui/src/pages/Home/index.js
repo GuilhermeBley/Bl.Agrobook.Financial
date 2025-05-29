@@ -7,7 +7,7 @@ import { getProducts, Status } from "./action";
 function Home() {
     const [pageData, setPageData] = useState({
         allItems: [],
-        cartItems: [],
+        cartItems: new Map(),
         items: new PaginableList([], 9),
         alertMessage: { success: true, message: '', timeout: undefined }
     })
@@ -41,6 +41,28 @@ function Home() {
 
         }, [])
 
+    const removeProductToCart = (product) => {
+
+        let cartItems = pageData.cartItems;
+        cartItems.delete(product)
+
+        setPageData(p => ({
+            ...p,
+            cartItems: cartItems
+        }));
+    }
+
+    const addProductToCart = (product, qtt) => {
+
+        let cartItems = pageData.cartItems;
+        cartItems.set(product, qtt)
+
+        setPageData(p => ({
+            ...p,
+            cartItems: cartItems
+        }));
+    }
+
     return (
         <>
             <PageNavigationBar />
@@ -55,13 +77,13 @@ function Home() {
                                 <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
                                     <ul className="list-group">
 
-                                        {pageData.cartItems.map((cartItem, i) => <>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        {Object.entries(pageData.cartItems).map(([key, cartItem]) => <>
+                                            <li key={key} className="list-group-item d-flex justify-content-between align-items-center">
                                                 <div>
                                                     {cartItem.product.name}
                                                     <span className="badge bg-primary rounded-pill ms-2">{cartItem.product.qtt}</span>
                                                 </div>
-                                                <button className="btn btn-sm btn-outline-danger">Remover</button>
+                                                <button className="btn btn-sm btn-outline-danger" onClick={() => removeProductToCart(cartItem.product)}>Remover</button>
                                             </li>
                                         </>)}
 
