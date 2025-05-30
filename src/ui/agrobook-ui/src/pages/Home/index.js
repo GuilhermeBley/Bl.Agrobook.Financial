@@ -54,6 +54,11 @@ function Home() {
 
     const addCartProduct = (product, qtt) => {
 
+        if (qtt < 1)
+        {
+            return removeCartProduct(product);
+        }
+
         let cartItems = pageData.cartItems;
         cartItems.set(product.code, ({
             product,
@@ -162,7 +167,8 @@ function Home() {
                                     <ProductCardItem
                                         description={i.description}
                                         quantity={undefined}
-                                        title={i.name} />
+                                        title={i.name} 
+                                        onItemChanged={(qtt) => addCartProduct(i, qtt)}/>
                                 </div>
                             })}
                         </div>
