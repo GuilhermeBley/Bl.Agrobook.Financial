@@ -41,10 +41,10 @@ function Home() {
 
         }, [])
 
-    const removeProductToCart = (product) => {
+    const removeCartProduct = (product) => {
 
         let cartItems = pageData.cartItems;
-        cartItems.delete(product)
+        cartItems.delete(product.code)
 
         setPageData(p => ({
             ...p,
@@ -52,10 +52,13 @@ function Home() {
         }));
     }
 
-    const addProductToCart = (product, qtt) => {
+    const addCartProduct = (product, qtt) => {
 
         let cartItems = pageData.cartItems;
-        cartItems.set(product, qtt)
+        cartItems.set(product.code, ({
+            product,
+            qtt
+        }))
 
         setPageData(p => ({
             ...p,
@@ -77,13 +80,13 @@ function Home() {
                                 <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
                                     <ul className="list-group">
 
-                                        {Object.entries(pageData.cartItems).map(([key, cartItem]) => <>
+                                        {pageData.cartItems.entries().map(([key, cartItem]) => <>
                                             <li key={key} className="list-group-item d-flex justify-content-between align-items-center">
                                                 <div>
                                                     {cartItem.product.name}
                                                     <span className="badge bg-primary rounded-pill ms-2">{cartItem.product.qtt}</span>
                                                 </div>
-                                                <button className="btn btn-sm btn-outline-danger" onClick={() => removeProductToCart(cartItem.product)}>Remover</button>
+                                                <button className="btn btn-sm btn-outline-danger" onClick={() => removeCartProduct(cartItem.product)}>Remover</button>
                                             </li>
                                         </>)}
 
