@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-function ProductCardItem({ title, quantity, description, onItemChanged = (qtty) => { } }) {
+function ProductCardItem({ title, quantity, description, initialQtt = 0, onItemChanged = (qtty) => { } }) {
 
     const [cardInfo, setCardInfo] = useState({
-        qttSelected: 0
+        qttSelected: initialQtt
     });
 
     const changeSelectedItemCount = (qtt) => {
