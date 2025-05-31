@@ -172,7 +172,7 @@ function Home() {
                             </nav>
                             : <></>}
 
-
+                        {/**TODO: add ConfirmOrderModal */}
 
                         <ScrollToTopButton />
                     </div>
