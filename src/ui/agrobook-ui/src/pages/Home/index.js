@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import ProductCardItem from "../../components/ProductCardItem"
+import ScrollToTopButton from "../../components/ScrollToTopButton"
 import { PaginableList } from "../../utils/PaginableList"
 import { getProducts, Status } from "./action";
 
@@ -170,6 +171,10 @@ function Home() {
                                 </ul>
                             </nav>
                             : <></>}
+
+
+
+                        <ScrollToTopButton />
                     </div>
                 </div>
             </div>
