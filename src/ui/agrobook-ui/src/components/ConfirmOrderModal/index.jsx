@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const OrderConfirmationModal = ({ 
-  products = [], 
-  show, 
-  onClose, 
-  onConfirm 
+const OrderConfirmationModal = ({
+  products = [],
+  show,
+  onClose,
+  onConfirm
 }) => {
+
+  const [modalData, setModalData] = useState(new {
+    userName: "",
+    userEmail: "",
+    userPhone: ""
+  });
+
+  useEffect(() => {
+
+  }, []);
 
   const handleConfirm = () => {
     onConfirm(orderItems);
@@ -19,9 +29,9 @@ const OrderConfirmationModal = ({
         <div className="modal-content">
           <div className="modal-header border-bottom-0">
             <h5 className="modal-title fw-bold">Confirmar Pedido</h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={onClose}
               aria-label="Close"
             ></button>

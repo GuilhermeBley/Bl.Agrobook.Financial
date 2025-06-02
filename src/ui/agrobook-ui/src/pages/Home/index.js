@@ -92,6 +92,10 @@ function Home() {
         }));
     }
 
+    const handleOrderConfirmation = (orders) => {
+        // TODO: handle order confirmation
+    }
+
     return (
         <>
             <PageNavigationBar />
@@ -187,7 +191,8 @@ function Home() {
                     name: x.product.name,
                     qtt: x.qtt,
                 }))}
-                show={shouldShowModalConfirmation}/>
+                show={shouldShowModalConfirmation}
+                onConfirm={handleOrderConfirmation}/>
         </>
     );
 }
