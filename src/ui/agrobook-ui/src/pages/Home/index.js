@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import ProductCardItem from "../../components/ProductCardItem"
 import ScrollToTopButton from "../../components/ScrollToTopButton"
+import ConfirmOrderModal from "../../components/ConfirmOrderModal"
 import { PaginableList } from "../../utils/PaginableList"
 import { getProducts, Status } from "./action";
 
@@ -12,6 +13,7 @@ function Home() {
         items: new PaginableList([], 9),
         alertMessage: { success: true, message: '', timeout: undefined }
     })
+    const [shouldShowModalConfirmation, setShouldShowModalConfirmation] = useState(false);
 
     useEffect(
         () => {
@@ -116,7 +118,7 @@ function Home() {
                                     </ul>
                                 </div>
 
-                                <button className="btn btn-primary w-100 mt-3">Finalizar pedido</button>
+                                <button className="btn btn-primary w-100 mt-3" onClick={(() => setShouldShowModalConfirmation(true))}>Finalizar pedido</button>
                                 <button className="btn btn-outline-secondary w-100 mt-2" onClick={removeAllCartProducts}>Limpar</button>
                             </div>
                         </div>
@@ -178,6 +180,14 @@ function Home() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmOrderModal 
+                products={pageData.cartItems.entries().map(([key, x]) => ({
+                    code: x.product.code,
+                    name: x.product.name,
+                    qtt: x.qtt,
+                }))}
+                show={shouldShowModalConfirmation}/>
         </>
     );
 }

@@ -6,35 +6,12 @@ const OrderConfirmationModal = ({
   onClose, 
   onConfirm 
 }) => {
-  const [quantities, setQuantities] = useState(
-    products.reduce((acc, product) => {
-      acc[product.id] = product.qtt || 1;
-      return acc;
-    }, {})
-  );
-
-  const handleQuantityChange = (productId, newQuantity) => {
-    setQuantities(prev => ({
-      ...prev,
-      [productId]: Math.max(1, parseInt(newQuantity) || 1)
-    }));
-  };
 
   const handleConfirm = () => {
-    const orderItems = products.map(product => ({
-      ...product,
-      qtt: quantities[product.id] || 1
-    }));
     onConfirm(orderItems);
   };
 
-  const calculateTotal = () => {
-    return products.reduce((sum, product) => {
-      return sum + (product.price * (quantities[product.id] || 1));
-    }, 0).toFixed(2);
-  };
-
-  if (!show) return null;
+  if (!show) return <></>;
 
   return (
     <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -55,38 +32,18 @@ const OrderConfirmationModal = ({
                 <thead>
                   <tr>
                     <th>Produto</th>
-                    <th>Preço Unitário</th>
                     <th>Quantidade</th>
-                    <th>Subtotal</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.map(product => (
-                    <tr key={product.id}>
+                    <tr key={product.code}>
                       <td>{product.name}</td>
-                      <td>R${product.price.toFixed(2)}</td>
-                      <td>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          min="1"
-                          value={quantities[product.id] || 1}
-                          onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                          style={{ width: '70px' }}
-                        />
-                      </td>
-                      <td>
-                        R${(product.price * (quantities[product.id] || 1)).toFixed(2)}
-                      </td>
+                      <td>{product.qtt}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-            <div className="d-flex justify-content-end mt-3">
-              <h5 className="fw-bold">
-                Total: R${calculateTotal()}
-              </h5>
             </div>
           </div>
           <div className="modal-footer border-top-0">
