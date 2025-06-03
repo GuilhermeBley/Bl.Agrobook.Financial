@@ -393,7 +393,7 @@ public class TaxViewModel
     {
         Included = 0,
         ToInclude = 0,
-        Exempt = true,
+        Exempt = false,
         ExemptValue = 0
     };
 

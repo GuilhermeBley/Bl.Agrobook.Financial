@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import ProductCardItem from "../../components/ProductCardItem"
+import ScrollToTopButton from "../../components/ScrollToTopButton"
+import ConfirmOrderModal from "../../components/ConfirmOrderModal"
 import { PaginableList } from "../../utils/PaginableList"
 import { getProducts, Status } from "./action";
 
 function Home() {
     const [pageData, setPageData] = useState({
         allItems: [],
+        cartItems: new Map(),
         items: new PaginableList([], 9),
         alertMessage: { success: true, message: '', timeout: undefined }
     })
+    const [shouldShowModalConfirmation, setShouldShowModalConfirmation] = useState(false);
 
     useEffect(
         () => {
@@ -40,6 +44,58 @@ function Home() {
 
         }, [])
 
+    const removeAllCartProducts = () => {
+
+        pageData.allItems.forEach(product => {
+            if (product.resetKey)
+                product.resetKey += 1;
+            else
+                product.resetKey = 0;
+        });
+        pageData.cartItems.clear();
+        setPageData(p => ({
+            ...p,
+            cartItems: pageData.cartItems,
+            allItems: pageData.allItems
+        }));
+    }
+
+    const removeCartProduct = (product) => {
+
+        let cartItems = pageData.cartItems;
+        cartItems.delete(product.code)
+        if (product.resetKey)
+            product.resetKey += 1;
+        else
+            product.resetKey = 0;
+        setPageData(p => ({
+            ...p,
+            cartItems: cartItems
+        }));
+    }
+
+    const addCartProduct = (product, qtt) => {
+
+        if (qtt < 1) {
+            return removeCartProduct(product);
+        }
+
+        let cartItems = pageData.cartItems;
+        cartItems.set(product.code, ({
+            product,
+            qtt
+        }))
+
+        setPageData(p => ({
+            ...p,
+            cartItems: cartItems
+        }));
+    }
+
+    const handleOrderConfirmation = (orders) => {
+        // TODO: handle order confirmation
+    }
+
     return (
         <>
             <PageNavigationBar />
@@ -53,46 +109,21 @@ function Home() {
 
                                 <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
                                     <ul className="list-group">
-                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Produto 1
-                                                <span className="badge bg-primary rounded-pill ms-2">3</span>
-                                            </div>
-                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Produto 2
-                                                <span className="badge bg-primary rounded-pill ms-2">1</span>
-                                            </div>
-                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Produto 3
-                                                <span className="badge bg-primary rounded-pill ms-2">2</span>
-                                            </div>
-                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Produto 4
-                                                <span className="badge bg-primary rounded-pill ms-2">5</span>
-                                            </div>
-                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Produto 5
-                                                <span className="badge bg-primary rounded-pill ms-2">1</span>
-                                            </div>
-                                            <button className="btn btn-sm btn-outline-danger">Remover</button>
-                                        </li>
+
+                                        {pageData.cartItems.entries().map(([key, cartItem]) => <>
+                                            <li key={key} className="list-group-item d-flex justify-content-between align-items-center" title={cartItem.product.name}>
+                                                <div className="bl-text-clamp-1">
+                                                    <span className="badge bg-primary rounded-pill ms-2">{cartItem.qtt}</span>
+                                                    {" " + cartItem.product.name}
+                                                </div>
+                                                <button className="btn btn-sm btn-outline-danger" onClick={() => removeCartProduct(cartItem.product)}>Remover</button>
+                                            </li>
+                                        </>)}
                                     </ul>
                                 </div>
 
-                                <button className="btn btn-primary w-100 mt-3">Finalizar pedido</button>
-                                <button className="btn btn-outline-secondary w-100 mt-2">Limpar</button>
+                                <button className="btn btn-primary w-100 mt-3" onClick={(() => setShouldShowModalConfirmation(true))}>Finalizar pedido</button>
+                                <button className="btn btn-outline-secondary w-100 mt-2" onClick={removeAllCartProducts}>Limpar</button>
                             </div>
                         </div>
                     </div>
@@ -121,11 +152,12 @@ function Home() {
 
                         <div className="row">
                             {pageData.items.CurrentShowedItems.map((i, index) => {
-                                return <div className="col-sm-4 mb-3" key={index}>
+                                return <div className="col-sm-4 mb-3" key={`product-${index}-${i.resetKey}`}>
                                     <ProductCardItem
                                         description={i.description}
                                         quantity={undefined}
-                                        title={i.name} />
+                                        title={i.name}
+                                        onItemChanged={(qtt) => addCartProduct(i, qtt)} />
                                 </div>
                             })}
                         </div>
@@ -145,9 +177,22 @@ function Home() {
                                 </ul>
                             </nav>
                             : <></>}
+
+                        {/**TODO: add ConfirmOrderModal */}
+
+                        <ScrollToTopButton />
                     </div>
                 </div>
             </div>
+
+            <ConfirmOrderModal 
+                products={pageData.cartItems.entries().map(([key, x]) => ({
+                    code: x.product.code,
+                    name: x.product.name,
+                    qtt: x.qtt,
+                }))}
+                show={shouldShowModalConfirmation}
+                onConfirm={handleOrderConfirmation}/>
         </>
     );
 }
