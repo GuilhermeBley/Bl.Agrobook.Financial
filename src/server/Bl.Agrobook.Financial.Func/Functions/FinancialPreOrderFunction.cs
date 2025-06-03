@@ -1,4 +1,5 @@
 ﻿using Bl.Agrobook.Financial.Func.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,6 @@ public class FinancialPreOrderFunction
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/preorder")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
-
+        throw new NotImplementedException();
     }
 }

@@ -7,18 +7,19 @@ const OrderConfirmationModal = ({
   onConfirm
 }) => {
 
-  const [modalData, setModalData] = useState(new {
+  const [modalData, setModalData] = useState(({
     userName: "",
     userEmail: "",
-    userPhone: ""
-  });
+    userPhone: "",
+    orderItems: []
+  }));
 
   useEffect(() => {
 
   }, []);
 
   const handleConfirm = () => {
-    onConfirm(orderItems);
+    onConfirm(modalData.orderItems);
   };
 
   if (!show) return <></>;
