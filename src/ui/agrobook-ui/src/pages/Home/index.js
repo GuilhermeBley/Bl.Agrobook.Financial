@@ -96,21 +96,57 @@ function Home() {
         // TODO: handle order confirmation
     }
 
+    const handleChangeToPage = (pageNumber) => {
+        pageNumber = parseInt(pageNumber)
+        if (pageNumber < 1 || pageNumber > pageData.items.TotalPageQuantity) {
+            console.warn(`Invalid page ${pageNumber}.`)
+            return;
+        }
+
+        pageData.items.ChangePage(pageNumber);
+        setPageData(p => ({
+            ...p
+        }))
+    }
+
     const handleOpenModal = () => {
-        if (pageData.cartItems.size == 0)
-        {
+        if (pageData.cartItems.size == 0) {
             setPageData(p => ({
                 ...p,
-                alertMessage: {message: "Selecione produtos para o carrinho.", success: false, timeout: 5000}
+                alertMessage: { message: "Selecione produtos para o carrinho.", success: false, timeout: 5000 }
             }))
             return;
         }
 
-        setShouldShowModalConfirmation(true)   
+        setShouldShowModalConfirmation(true)
     }
 
     const handleModalClose = () => {
-        setShouldShowModalConfirmation(false)   
+        setShouldShowModalConfirmation(false)
+    }
+
+    const getPageNumberList = () => {
+        let currentPage = pageData.items.CurrentPage;
+        let totalPages = pageData.items.TotalPageQuantity;
+        let showStart = totalPages > 5 && currentPage - 2 > 1
+        let showEnd = totalPages > 5 && currentPage + 3 <= totalPages
+        if (totalPages > 5 && currentPage > 3)
+            return [
+                ({ number: currentPage - 1, view: `Anterior`, enabled: currentPage > 1 }),
+                ({ number: 1, view: `...`, enabled: showStart }),/**start */
+                ({ number: currentPage, view: `${currentPage}`, enabled: true }),
+                ({ number: currentPage + 1, view: `${currentPage + 1}`, enabled: currentPage + 1 <= totalPages }),
+                ({ number: currentPage + 2, view: `${currentPage + 2}`, enabled: currentPage + 2 <= totalPages }),
+                ({ number: totalPages, view: `...`, enabled: showEnd }),/**end */
+                ({ number: currentPage + 1, view: `Próxima`, enabled: currentPage + 1 <= totalPages }),
+            ]
+        return [
+            ({ number: currentPage - 1, view: `Anterior`, enabled: currentPage > 1 }),
+            ({ number: currentPage, view: `${currentPage}`, enabled: true }),
+            ({ number: currentPage + 1, view: `${currentPage + 1}`, enabled: currentPage + 1 <= totalPages }),
+            ({ number: currentPage + 2, view: `${currentPage + 2}`, enabled: currentPage + 2 <= totalPages }),
+            ({ number: currentPage + 1, view: `Próxima`, enabled: currentPage + 1 <= totalPages }),
+        ]
     }
 
     return (
@@ -181,19 +217,19 @@ function Home() {
                         </div>
 
                         {pageData.items.TotalPageQuantity > 1
-                            ? <nav aria-label="Page navigation">
-                                <ul className="pagination justify-content-center">
-                                    <li className="page-item disabled">
-                                        <a className="page-link" href="#" tabIndex="-1">Anterior</a>
-                                    </li>
-                                    <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                    <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                    <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                    <li className="page-item">
-                                        <a className="page-link" href="#">Próxima</a>
-                                    </li>
-                                </ul>
-                            </nav>
+                            ? <>
+                                <nav aria-label="Page navigation">
+                                    <ul className="pagination justify-content-center">
+                                        {getPageNumberList().map((page, idx) => <>
+                                            <li className={page.number == pageData.items.CurrentPage ? "page-item active" : "page-item"} key={idx}>
+                                                <a className={page.enabled ? "page-link" : "page-link disabled"} href="#" tabIndex="-1" onClick={() => handleChangeToPage(page.number)}>
+                                                    {page.view}
+                                                </a>
+                                            </li>
+                                        </>)}
+                                    </ul>
+                                </nav>
+                            </>
                             : <></>}
 
                         {/**TODO: add ConfirmOrderModal */}
@@ -203,7 +239,7 @@ function Home() {
                 </div>
             </div>
 
-            <ConfirmOrderModal 
+            <ConfirmOrderModal
                 products={pageData.cartItems.entries().map(([key, x]) => ({
                     code: x.product.code,
                     name: x.product.name,
@@ -211,7 +247,7 @@ function Home() {
                 }))}
                 show={shouldShowModalConfirmation}
                 onClose={handleModalClose}
-                onConfirm={handleOrderConfirmation}/>
+                onConfirm={handleOrderConfirmation} />
         </>
     );
 }
