@@ -14,6 +14,7 @@ function Home() {
         alertMessage: { success: true, message: '', timeout: undefined }
     })
     const [shouldShowModalConfirmation, setShouldShowModalConfirmation] = useState(false);
+    const [textProductsFilter, setTextProductsFilter] = useState('');
 
     useEffect(
         () => {
@@ -125,6 +126,25 @@ function Home() {
         setShouldShowModalConfirmation(false)
     }
 
+    const handleTextProdFilter = () => {
+        let searchInput = textProductsFilter?.toLowerCase()?.trim();
+        if (!searchInput || searchInput.length < 1) {
+            pageData.items.UpdateItems(
+                pageData.allItems
+            )
+            setPageData(p => ({
+                ...p
+            }))
+            return;
+        }
+        pageData.items.UpdateItems(
+            pageData.allItems.filter(x => ("" + x.name).toLowerCase().includes(searchInput))
+        )
+        setPageData(p => ({
+            ...p
+        }))
+    }
+
     const getPageNumberList = () => {
         let currentPage = pageData.items.CurrentPage;
         let totalPages = pageData.items.TotalPageQuantity;
@@ -185,8 +205,8 @@ function Home() {
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Busque os produtos..." />
-                                    <button className="btn btn-primary" type="button">
+                                    <input type="text" className="form-control" placeholder="Busque os produtos..." value={textProductsFilter} onChange={e => setTextProductsFilter(e.target.value)} />
+                                    <button className="btn btn-primary" type="button" onClick={handleTextProdFilter}>
                                         <i className="bi bi-search"></i>
                                     </button>
                                 </div>
