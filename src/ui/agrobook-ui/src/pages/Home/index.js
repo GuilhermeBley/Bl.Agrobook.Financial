@@ -96,6 +96,23 @@ function Home() {
         // TODO: handle order confirmation
     }
 
+    const handleOpenModal = () => {
+        if (pageData.cartItems.size == 0)
+        {
+            setPageData(p => ({
+                ...p,
+                alertMessage: {message: "Selecione produtos para o carrinho.", success: false, timeout: 5000}
+            }))
+            return;
+        }
+
+        setShouldShowModalConfirmation(true)   
+    }
+
+    const handleModalClose = () => {
+        setShouldShowModalConfirmation(false)   
+    }
+
     return (
         <>
             <PageNavigationBar />
@@ -122,7 +139,7 @@ function Home() {
                                     </ul>
                                 </div>
 
-                                <button className="btn btn-primary w-100 mt-3" onClick={(() => setShouldShowModalConfirmation(true))}>Finalizar pedido</button>
+                                <button className="btn btn-primary w-100 mt-3" onClick={(() => handleOpenModal())}>Finalizar pedido</button>
                                 <button className="btn btn-outline-secondary w-100 mt-2" onClick={removeAllCartProducts}>Limpar</button>
                             </div>
                         </div>
@@ -157,6 +174,7 @@ function Home() {
                                         description={i.description}
                                         quantity={undefined}
                                         title={i.name}
+                                        imgUrl={i.imgUrl}
                                         onItemChanged={(qtt) => addCartProduct(i, qtt)} />
                                 </div>
                             })}
@@ -192,6 +210,7 @@ function Home() {
                     qtt: x.qtt,
                 }))}
                 show={shouldShowModalConfirmation}
+                onClose={handleModalClose}
                 onConfirm={handleOrderConfirmation}/>
         </>
     );
