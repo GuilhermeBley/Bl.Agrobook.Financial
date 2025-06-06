@@ -18,6 +18,13 @@ function Home() {
 
     useEffect(
         () => {
+            handleTextProdFilter()
+        },
+        [textProductsFilter]
+    )
+
+    useEffect(
+        () => {
 
             const populateProducts = async () => {
                 let prodResult = await getProducts();
