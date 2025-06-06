@@ -128,7 +128,7 @@ function Home() {
 
     const handleTextProdFilter = () => {
         let searchInput = textProductsFilter?.toLowerCase()?.trim();
-        if (!searchInput || searchInput.length < 1) {
+        if (!searchInput || searchInput.length < 2) {
             pageData.items.UpdateItems(
                 pageData.allItems
             )
@@ -205,7 +205,7 @@ function Home() {
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Busque os produtos..." value={textProductsFilter} onChange={e => setTextProductsFilter(e.target.value)} />
+                                    <input type="text" className="form-control" placeholder="Busque os produtos..." value={textProductsFilter} onInput={e => setTextProductsFilter(e.target.value)} />
                                     <button className="btn btn-primary" type="button" onClick={handleTextProdFilter}>
                                         <i className="bi bi-search"></i>
                                     </button>
@@ -213,12 +213,9 @@ function Home() {
                             </div>
                             <div className="col-md-6 text-md-end">
                                 <div className="dropdown d-inline-block me-2">
-                                    <button className="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                                        Ordenar por: Nome
+                                    <button className="btn btn-outline-primary disabled" type="button">
+                                        <small>{pageData.items.getLength} produtos encontrados</small>
                                     </button>
-                                    <ul className="dropdown-menu">
-                                        <li><a className="dropdown-item" href="#">Nome</a></li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
