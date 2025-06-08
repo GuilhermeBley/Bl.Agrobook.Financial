@@ -13,43 +13,43 @@ public class PreOrderRepository : RepositoryBase
     {
     }
 
-    public async Task InsertPreOrderAsync(PreOrderModel preOrder, CancellationToken cancellationToken = default)
+    public async Task InsertAsync(PreOrderModel model, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
-        await collection.InsertOneAsync(preOrder, new() { }, cancellationToken);
+        await collection.InsertOneAsync(model, new() { }, cancellationToken);
     }
 
-    public async Task InsertManyPreOrdersAsync(IEnumerable<PreOrderModel> preOrders, CancellationToken cancellationToken = default)
+    public async Task InsertManyAsync(IEnumerable<PreOrderModel> model, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
-        await collection.InsertManyAsync(preOrders, new() { }, cancellationToken);
+        await collection.InsertManyAsync(model, new() { }, cancellationToken);
     }
 
-    public async Task<PreOrderModel> GetPreOrderByIdAsync(Guid preOrderId, CancellationToken cancellationToken = default)
+    public async Task<PreOrderModel> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
-        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Id, preOrderId);
+        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Id, id);
         return await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<PreOrderModel>> GetAllPreOrdersAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PreOrderModel>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
         return await collection.Find(_ => true).ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> UpdatePreOrderAsync(PreOrderModel preOrder, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateAsync(PreOrderModel preOrder, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
-        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Code, preOrder.Code);
+        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Id, preOrder.Id);
         var result = await collection.ReplaceOneAsync(filter, preOrder, cancellationToken: cancellationToken);
         return result.IsAcknowledged && result.ModifiedCount > 0;
     }
 
-    public async Task<bool> DeletePreOrderAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<PreOrderModel>(CollectionName);
-        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Code, id);
+        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Id, id);
         var result = await collection.DeleteOneAsync(filter, cancellationToken);
         return result.IsAcknowledged && result.DeletedCount > 0;
     }

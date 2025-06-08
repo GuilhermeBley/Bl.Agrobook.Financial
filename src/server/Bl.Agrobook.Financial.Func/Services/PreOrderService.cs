@@ -21,8 +21,9 @@ public class PreOrderService
             throw new ArgumentException("Dados inválidos.");
         }
 
+        // check if delivery exists
 
-        await _preOrderRepository.InsertPreOrderAsync(
+        await _preOrderRepository.InsertAsync(
             new PreOrderModel()
             {
                 CustomerCode = null,
@@ -44,5 +45,7 @@ public class PreOrderService
                 UpdateAt = DateTime.Now
             }, 
             cancellationToken);
+
+
     }
 }
