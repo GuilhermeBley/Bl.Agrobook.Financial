@@ -1,4 +1,5 @@
-﻿using Bl.Agrobook.Financial.Func.Services;
+﻿using Bl.Agrobook.Financial.Func.Repositories;
+using Bl.Agrobook.Financial.Func.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -11,17 +12,14 @@ public class FinancialPreOrderFunction
     private readonly AuthService _authService;
     private readonly ILogger<FinancialOrderFunction> _logger;
     private readonly PreOrderService _preOrderService;
-    private readonly FinancialApiService _financialApiService;
 
     public FinancialPreOrderFunction(
         AuthService authService,
         ILogger<FinancialOrderFunction> logger,
-        FinancialApiService financialApiService,
         PreOrderService preOrderService)
     {
         _authService = authService;
         _logger = logger;
-        _financialApiService = financialApiService;
         _preOrderService = preOrderService;
     }
 
