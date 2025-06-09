@@ -10,4 +10,9 @@ public class DeliveryDateModel
     public DateOnly DeliveryAt { get; set; }
     public DateTime InsertedAt { get; set; }
     public string? UserId { get; set; }
+
+    public static string GenerateId(DateOnly deliveryAt)
+    {
+        return $"{deliveryAt:yyyy-MM-dd}";
+    }
 }

@@ -38,6 +38,7 @@ var host = new HostBuilder()
 
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.ProductRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.PreOrderRepository>()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.DeliveryDateRepository>()
 
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()

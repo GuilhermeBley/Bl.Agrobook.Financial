@@ -6,10 +6,12 @@ namespace Bl.Agrobook.Financial.Func.Services;
 public class PreOrderService
 {
     private readonly PreOrderRepository _preOrderRepository;
+    private readonly DeliveryDateRepository _deliveryDateRepository;
 
-    public PreOrderService(PreOrderRepository preOrderRepository)
+    public PreOrderService(PreOrderRepository preOrderRepository, DeliveryDateRepository deliveryDateRepository)
     {
         _preOrderRepository = preOrderRepository;
+        _deliveryDateRepository = deliveryDateRepository;
     }
 
     public async Task InsertPreOrderAsync(CreatePreOrderModel preOrderRequest, CancellationToken cancellationToken = default)
@@ -21,7 +23,11 @@ public class PreOrderService
             throw new ArgumentException("Dados inválidos.");
         }
 
-        // check if delivery exists
+        var deliveryId = DeliveryDateModel.GenerateId(preOrderRequest.DeliveryAt);
+        if ((await _deliveryDateRepository.GetPreOrderByIdAsync(deliveryId, cancellationToken)) is null)
+        {
+            throw new ArgumentException($"Data de entrega de produtos ainda indisponíveis para dia ${preOrderRequest.DeliveryAt:dd/MM/yyyy}.");
+        }
 
         await _preOrderRepository.InsertAsync(
             new PreOrderModel()
@@ -45,7 +51,5 @@ public class PreOrderService
                 UpdateAt = DateTime.Now
             }, 
             cancellationToken);
-
-
     }
 }
