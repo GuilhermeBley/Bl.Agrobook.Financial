@@ -3,6 +3,8 @@ using Bl.Agrobook.Financial.Func.Repositories;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 
+public record PreOrderCreatedResult(Guid Id);
+
 public class PreOrderService
 {
     private readonly PreOrderRepository _preOrderRepository;
@@ -14,7 +16,7 @@ public class PreOrderService
         _deliveryDateRepository = deliveryDateRepository;
     }
 
-    public async Task InsertPreOrderAsync(CreatePreOrderModel preOrderRequest, CancellationToken cancellationToken = default)
+    public async Task<PreOrderCreatedResult> InsertPreOrderAsync(CreatePreOrderModel preOrderRequest, CancellationToken cancellationToken = default)
     {
         var result = ModelValidator.Validate(preOrderRequest);
 
@@ -29,7 +31,7 @@ public class PreOrderService
             throw new ArgumentException($"Data de entrega de produtos ainda indisponíveis para dia ${preOrderRequest.DeliveryAt:dd/MM/yyyy}.");
         }
 
-        await _preOrderRepository.InsertAsync(
+        var model =
             new PreOrderModel()
             {
                 CustomerCode = null,
@@ -49,7 +51,9 @@ public class PreOrderService
                     Quantity = p.Quantity
                 }).ToList(),
                 UpdateAt = DateTime.Now
-            }, 
-            cancellationToken);
+            };
+        await _preOrderRepository.InsertAsync(model, cancellationToken);
+
+        return new(model.Id);
     }
 }
