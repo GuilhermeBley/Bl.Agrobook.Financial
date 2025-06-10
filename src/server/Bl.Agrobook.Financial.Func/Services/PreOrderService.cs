@@ -56,4 +56,13 @@ public class PreOrderService
 
         return new(model.Id);
     }
+
+    public async Task<IEnumerable<PreOrderModel>> GetByDeliveryDateAsync(
+        DateOnly deliveryDate,
+        CancellationToken cancellationToken = default)
+    {
+        var orders = await _preOrderRepository.GetByDeliveryDateAsync(deliveryDate, cancellationToken);
+
+        return orders;
+    }
 }

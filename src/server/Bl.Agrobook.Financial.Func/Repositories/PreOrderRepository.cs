@@ -2,6 +2,7 @@
 using Bl.Agrobook.Financial.Func.Options;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Bl.Agrobook.Financial.Func.Repositories;
 
@@ -30,6 +31,13 @@ public class PreOrderRepository : RepositoryBase
         var collection = GetCollection<PreOrderModel>(CollectionName);
         var filter = Builders<PreOrderModel>.Filter.Eq(p => p.Id, id);
         return await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<PreOrderModel>> GetByDeliveryDateAsync(DateOnly deliveryDate, CancellationToken cancellationToken = default)
+    {
+        var collection = GetCollection<PreOrderModel>(CollectionName);
+        var filter = Builders<PreOrderModel>.Filter.Eq(p => p.DeliveryAt, deliveryDate);
+        return await collection.Find(filter).ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<PreOrderModel>> GetAllAsync(CancellationToken cancellationToken = default)

@@ -27,7 +27,7 @@ public class FinancialPreOrderFunction
     }
 
     [Function("FinancialPreOrderCreation")]
-    public async Task<IActionResult> Run(
+    public async Task<IActionResult> RunFinancialPreOrderCreation(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/preorder")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
@@ -52,6 +52,36 @@ public class FinancialPreOrderFunction
             _logger.LogError(e, "Failed to insert pre-order.");
             return new BadRequestObjectResult(
                 new { Message = "Erro ao inserir pré-pedido." });
+        }
+    }
+
+    [Function("FinancialPreOrderQuery")]
+    public async Task<IActionResult> RunFinancialPreOrderQuery(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "financial/preorder")] HttpRequest req,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_authService.IsAuthenticated(req))
+        {
+            return new UnauthorizedResult();
+        }
+
+        try
+        {
+            var deliveryDate = req.Query["deliveryDate"].ToString();
+            if (deliveryDate is null || 
+                DateOnly.TryParseExact(deliveryDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
+                return new BadRequestObjectResult(
+                    new { Message = "Erro ao consultar. Parâmetros inválidos." });
+
+            var resp = await _preOrderService.GetByDeliveryDateAsync(dt, cancellationToken);
+
+            return new OkObjectResult(resp);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get pre-orders.");
+            return new BadRequestObjectResult(
+                new { Message = "Erro ao consultar." });
         }
     }
 }
