@@ -1,5 +1,33 @@
 import api from '../../api/AzFunApi'
 
+export const createPreOrder = async (request) => {
+
+    if (!request || !Array.isArray(request.products)) {
+        return;
+    }
+
+    const response = await api.post(
+        'api/financial/order/pdf',
+        {
+            customerPhone: request.customerPhone,
+            customerEmail: request.customerEmail,
+            customerName: request.customerName,
+            product: request.products.map(x => ({
+                productCode: "123",
+                productName: "abc",
+                quantity: 1,
+            })),
+            deliveryAt: request.deliveryAt,
+            obs: undefined
+        },
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            responseType: 'blob'
+        });
+}
+
 export const getProducts = async () => {
     let response = await api.get('api/product')
 

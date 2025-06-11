@@ -4,7 +4,7 @@ import ProductCardItem from "../../components/ProductCardItem"
 import ScrollToTopButton from "../../components/ScrollToTopButton"
 import ConfirmOrderModal from "../../components/ConfirmOrderModal"
 import { PaginableList } from "../../utils/PaginableList"
-import { getProducts, Status } from "./action";
+import { getProducts, Status, createPreOrder } from "./action";
 
 function Home() {
     const [pageData, setPageData] = useState({
@@ -100,8 +100,8 @@ function Home() {
         }));
     }
 
-    const handleOrderConfirmation = (orders) => {
-        // TODO: handle order confirmation
+    const handleOrderConfirmation = async (orders) => {
+        let response = await createPreOrder(orders);
     }
 
     const handleChangeToPage = (pageNumber) => {
