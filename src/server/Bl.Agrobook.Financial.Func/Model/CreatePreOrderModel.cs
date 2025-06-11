@@ -23,7 +23,7 @@ public class CreatePreOrderModel
     [Required(ErrorMessage = "Insira o nome."), StringLength(500, MinimumLength = 6, ErrorMessage = "Nome inválido.")]
     public string CustomerName { get; set; } = string.Empty;
     [MinLength(1, ErrorMessage = "Deve conter pelo menos um produto..")]
-    public List<CreatePreOrderProductModel> Product { get; set; } = [];
+    public List<CreatePreOrderProductModel> Products { get; set; } = [];
     public DateOnly DeliveryAt { get; set; }
     public string? Obs { get; set; }
 }
