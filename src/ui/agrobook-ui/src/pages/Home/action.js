@@ -13,9 +13,9 @@ export const createPreOrder = async (request) => {
             customerEmail: request.customerEmail,
             customerName: request.customerName,
             product: request.products.map(x => ({
-                productCode: "123",
-                productName: "abc",
-                quantity: 1,
+                productCode: x.code,
+                productName: x.name,
+                quantity: x.qtt,
             })),
             deliveryAt: request.deliveryAt,
             obs: undefined
@@ -26,6 +26,18 @@ export const createPreOrder = async (request) => {
             },
             responseType: 'blob'
         });
+
+    if (response.status !== 201){
+        return {
+            Status: Status.Error,
+            Result: "Falha ao inserir pré cadastro."
+        }
+    }
+
+    return {
+        Status: Status.Ok,
+        Result: ({ createId: response.data.id })
+    }
 }
 
 export const getProducts = async () => {
