@@ -206,7 +206,7 @@ function Home() {
                             <div className="card-body">
                                 <h5 className="card-title">Meus pedidos</h5>
 
-                                <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
+                                <div className="overflow-auto" style={{ maxHeight: "45vh", minHeight: "45vh" }}>
                                     <ul className="list-group">
 
                                         {pageData.cartItems.entries().map(([key, cartItem]) => <>
@@ -282,15 +282,19 @@ function Home() {
                 </div>
             </div>
 
-            <ConfirmOrderModal
-                products={pageData.cartItems.entries().map(([key, x]) => ({
-                    code: x.product.code,
-                    name: x.product.name,
-                    qtt: x.qtt,
-                }))}
-                show={shouldShowModalConfirmation}
-                onClose={handleModalClose}
-                onConfirm={handleOrderConfirmation} />
+            {shouldShowModalConfirmation
+                ? <>
+                    <ConfirmOrderModal
+                        products={pageData.cartItems.entries().map(([key, x]) => ({
+                            code: x.product.code,
+                            name: x.product.name,
+                            qtt: x.qtt,
+                        }))}
+                        show={shouldShowModalConfirmation}
+                        onClose={handleModalClose}
+                        onConfirm={handleOrderConfirmation} />
+                </>
+                : <></>}
         </>
     );
 }

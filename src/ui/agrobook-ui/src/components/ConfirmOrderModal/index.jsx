@@ -30,7 +30,7 @@ const OrderConfirmationModal = ({
       name: '',
       email: '',
       phone: '',
-      orderItems: []
+      orderItems: products
     },
     validationSchema,
     onSubmit: (values) => {
@@ -124,7 +124,7 @@ const OrderConfirmationModal = ({
                             </tr>
                           </thead>
                           <tbody>
-                            {products.map(product => (
+                            {formik.initialValues.orderItems.map(product => (
                               <tr key={product.code}>
                                 <td>{product.name}</td>
                                 <td>{product.qtt}</td>
