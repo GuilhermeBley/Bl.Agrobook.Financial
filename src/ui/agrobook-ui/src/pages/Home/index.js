@@ -101,7 +101,26 @@ function Home() {
     }
 
     const handleOrderConfirmation = async (orders) => {
-        let response = await createPreOrder(orders);
+
+        try {
+            let response = await createPreOrder(orders);
+
+            if (response.Status == Status.Error) {
+                setPageData(p => ({
+                    ...p,
+                    alertMessage: ({ success: false, message: response.Result })
+                }));
+                return;
+            }
+
+            setPageData(p => ({
+                ...p,
+                alertMessage: ({ success: true, message: "Pedido adicionado com sucesso." })
+            }));
+        } finally {
+
+            setShouldShowModalConfirmation(false);
+        }
     }
 
     const handleChangeToPage = (pageNumber) => {

@@ -57,105 +57,108 @@ const OrderConfirmationModal = ({
           </div>
           <div className="modal-body">
 
-            <div className="mt-5">
+            <div className="mt-1">
               <div className="row justify-content-center">
-                <div className="card-header bg-primary text-white">
-                  <h6 className="mb-0">Meus dados</h6>
-                </div>
                 <div className="card-body">
                   <form onSubmit={formik.handleSubmit}>
-                    <div className="mb-3">
-                      <label htmlFor="name" className="form-label">Full Name</label>
-                      <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        className={`form-control ${formik.touched.name && formik.errors.name ? 'is-invalid' : ''
-                          }`}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.name}
-                      />
-                      {formik.touched.name && formik.errors.name ? (
-                        <div className="invalid-feedback">{formik.errors.name}</div>
-                      ) : null}
+                    <div id='user-info' className='overflow-auto' style={({ maxHeight: "60vh" })}>
+
+                      <div className="mb-1">
+                        <label htmlFor="name" className="form-label">Nome completo</label>
+                        <input
+                          id="name"
+                          name="name"
+                          type="text"
+                          className={`form-control ${formik.touched.name && formik.errors.name ? 'is-invalid' : ''
+                            }`}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          value={formik.values.name}
+                        />
+                        {formik.touched.name && formik.errors.name ? (
+                          <div className="invalid-feedback">{formik.errors.name}</div>
+                        ) : null}
+                      </div>
+
+                      <div className="mb-1">
+                        <label htmlFor="email" className="form-label">E-mail</label>
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          className={`form-control ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''
+                            }`}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          value={formik.values.email}
+                        />
+                        {formik.touched.email && formik.errors.email ? (
+                          <div className="invalid-feedback">{formik.errors.email}</div>
+                        ) : null}
+                      </div>
+
+                      <div className="mb-1">
+                        <label htmlFor="phone" className="form-label">Telefone</label>
+                        <input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          className={`form-control ${formik.touched.phone && formik.errors.phone ? 'is-invalid' : ''
+                            }`}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          value={formik.values.phone}
+                          placeholder="ex. (15)9999-9999"
+                        />
+                        {formik.touched.phone && formik.errors.phone ? (
+                          <div className="invalid-feedback">{formik.errors.phone}</div>
+                        ) : null}
+                      </div>
+
+                      <div className="table-responsive">
+                        <table className="table">
+                          <thead>
+                            <tr>
+                              <th>Produto</th>
+                              <th>Quantidade</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {products.map(product => (
+                              <tr key={product.code}>
+                                <td>{product.name}</td>
+                                <td>{product.qtt}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
 
-                    <div className="mb-3">
-                      <label htmlFor="email" className="form-label">Email Address</label>
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        className={`form-control ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''
-                          }`}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.email}
-                      />
-                      {formik.touched.email && formik.errors.email ? (
-                        <div className="invalid-feedback">{formik.errors.email}</div>
-                      ) : null}
-                    </div>
+                    <div className="modal-footer border-top-0">
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary me-2"
+                        onClick={onClose}
+                      >
+                        Cancelar
+                      </button>
 
-                    <div className="mb-3">
-                      <label htmlFor="phone" className="form-label">Phone Number</label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        className={`form-control ${formik.touched.phone && formik.errors.phone ? 'is-invalid' : ''
-                          }`}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.phone}
-                        placeholder="e.g. 123-456-7890"
-                      />
-                      {formik.touched.phone && formik.errors.phone ? (
-                        <div className="invalid-feedback">{formik.errors.phone}</div>
-                      ) : null}
+
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={formik.isSubmitting}
+                      >
+                        {formik.isSubmitting ? 'Finalizando...' : 'Finalizar Pedido'}
+                      </button>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
 
-            <div className="table-responsive">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Produto</th>
-                    <th>Quantidade</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map(product => (
-                    <tr key={product.code}>
-                      <td>{product.name}</td>
-                      <td>{product.qtt}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="modal-footer border-top-0">
-            <button
-              type="button"
-              className="btn btn-outline-secondary me-2"
-              onClick={onClose}
-            >
-              Cancelar
-            </button>
 
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? 'Finalizando...' : 'Finalizar Pedido'}
-            </button>
           </div>
         </div>
       </div>
