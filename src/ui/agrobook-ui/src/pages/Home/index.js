@@ -58,7 +58,7 @@ function Home() {
             if (product.resetKey)
                 product.resetKey += 1;
             else
-                product.resetKey = 0;
+                product.resetKey = 1;
         });
         pageData.cartItems.clear();
         setPageData(p => ({
