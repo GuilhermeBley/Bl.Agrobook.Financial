@@ -34,9 +34,21 @@ const OrderConfirmationModal = ({
     },
     validationSchema,
     onSubmit: (values) => {
-      // Handle form submission
-      alert(JSON.stringify(values, null, 2));
-      onConfirm(values.orderItems);
+      
+      
+
+      onConfirm(({
+        customerPhone: values.phone,
+        customerEmail: values.email,
+        customerName: values.name,
+        deliveryAt: values.deliveryAt, // TODO: add this property deliveryAt
+        products: values.orderItems.map(x => ({
+          productCode: x.code,
+          productName: x.name,
+          quantity: x.qtt,
+        })),
+        obs: undefined,
+      }));
     },
   });
 
