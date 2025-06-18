@@ -113,6 +113,7 @@ function Home() {
                 return;
             }
 
+            removeAllCartProducts();
             setPageData(p => ({
                 ...p,
                 alertMessage: ({ success: true, message: "Pedido adicionado com sucesso." })

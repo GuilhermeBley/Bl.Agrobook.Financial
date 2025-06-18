@@ -44,9 +44,9 @@ const OrderConfirmationModal = ({
         customerName: values.name,
         deliveryAt: values.deliveryAt, // TODO: add this property deliveryAt
         products: values.orderItems.map(x => ({
-          productCode: x.code,
-          productName: x.name,
-          quantity: x.qtt,
+          code: x.code,
+          name: x.name,
+          qtt: x.qtt,
         })),
         obs: undefined,
       }));

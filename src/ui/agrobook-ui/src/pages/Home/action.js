@@ -7,7 +7,7 @@ export const createPreOrder = async (request) => {
     }
 
     const response = await api.post(
-        'api/financial/order/pdf',
+        'api/financial/preorder',
         {
             customerPhone: request.customerPhone,
             customerEmail: request.customerEmail,
