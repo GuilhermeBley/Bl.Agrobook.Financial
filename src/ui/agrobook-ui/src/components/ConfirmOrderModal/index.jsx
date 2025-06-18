@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { UserStorageService } from '../../services/UserStorageService'
 
 const OrderConfirmationModal = ({
   products = [],
@@ -8,7 +9,7 @@ const OrderConfirmationModal = ({
   onClose,
   onConfirm
 }) => {
-
+  const storeService = new UserStorageService();
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, 'Nome deve conter mais de dois caracteres')
@@ -25,11 +26,12 @@ const OrderConfirmationModal = ({
       .required('Telefone é obrigatório'),
   });
 
+  var userInfo = storeService.getUserInfo();
   const formik = useFormik({
     initialValues: {
-      name: '',
-      email: '',
-      phone: '',
+      name: userInfo.name,
+      email: userInfo.email,
+      phone: userInfo.phone,
       orderItems: [...products]
     },
     validationSchema,
@@ -37,6 +39,12 @@ const OrderConfirmationModal = ({
       
       console.log('requesting to create order: ')
       console.log(values)
+
+      storeService.setUserInfo(({
+        email: values.email,
+        name: values.name,
+        phone: values.phone
+      }));
 
       onConfirm(({
         customerPhone: values.phone,
