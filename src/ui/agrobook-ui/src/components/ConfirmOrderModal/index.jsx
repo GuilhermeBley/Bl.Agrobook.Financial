@@ -36,7 +36,7 @@ const OrderConfirmationModal = ({
     },
     validationSchema,
     onSubmit: (values) => {
-      
+
       console.log('requesting to create order: ')
       console.log(values)
 
@@ -50,7 +50,7 @@ const OrderConfirmationModal = ({
         customerPhone: values.phone,
         customerEmail: values.email,
         customerName: values.name,
-        deliveryAt: values.deliveryAt, // TODO: add this property deliveryAt
+        deliveryAt: values.deliveryAt,
         products: values.orderItems.map(x => ({
           code: x.code,
           name: x.name,
@@ -118,22 +118,43 @@ const OrderConfirmationModal = ({
                         ) : null}
                       </div>
 
-                      <div className="mb-1">
-                        <label htmlFor="phone" className="form-label">Telefone</label>
-                        <input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          className={`form-control ${formik.touched.phone && formik.errors.phone ? 'is-invalid' : ''
-                            }`}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          value={formik.values.phone}
-                          placeholder="ex. (15)9999-9999"
-                        />
-                        {formik.touched.phone && formik.errors.phone ? (
-                          <div className="invalid-feedback">{formik.errors.phone}</div>
-                        ) : null}
+                      <div className='row'>
+                        <div className='col-9'>
+                          <div className="mb-1">
+                            <label htmlFor="phone" className="form-label">Telefone</label>
+                            <input
+                              id="phone"
+                              name="phone"
+                              type="tel"
+                              className={`form-control ${formik.touched.phone && formik.errors.phone ? 'is-invalid' : ''
+                                }`}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              value={formik.values.phone}
+                              placeholder="ex. (15)9999-9999"
+                            />
+                            {formik.touched.phone && formik.errors.phone ? (
+                              <div className="invalid-feedback">{formik.errors.phone}</div>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className='col-3'>
+                          <div className="mb-1">
+                            <label className="form-label">Data de coleta</label>
+                            <input
+                              id="inputDeliveryAt"
+                              name="inputDeliveryAt"
+                              type="date"
+                              className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              value={formik.values.deliveryAt}
+                            />
+                            {formik.touched.phone && formik.errors.phone ? (
+                              <div className="invalid-feedback">{formik.errors.phone}</div>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
 
                       <div className="table-responsive">
