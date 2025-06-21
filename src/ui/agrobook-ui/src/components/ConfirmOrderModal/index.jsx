@@ -3,6 +3,16 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { UserStorageService } from '../../services/UserStorageService'
 
+const getDeliveryRange = () => {
+  let minDate = new Date();
+  let maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
+  return {
+    minDate,
+    maxDate
+  }
+}
+
 const OrderConfirmationModal = ({
   products = [],
   show,
@@ -119,7 +129,7 @@ const OrderConfirmationModal = ({
                       </div>
 
                       <div className='row'>
-                        <div className='col-9'>
+                        <div className='col-md-8'>
                           <div className="mb-1">
                             <label htmlFor="phone" className="form-label">Telefone</label>
                             <input
@@ -138,13 +148,15 @@ const OrderConfirmationModal = ({
                             ) : null}
                           </div>
                         </div>
-                        <div className='col-3'>
+                        <div className='col-md-4'>
                           <div className="mb-1">
                             <label className="form-label">Data de coleta</label>
                             <input
                               id="inputDeliveryAt"
                               name="inputDeliveryAt"
                               type="date"
+                              min={getDeliveryRange().minDate.toISOString().split('T')[0]}
+                              max={getDeliveryRange().maxDate.toISOString().split('T')[0]}
                               className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
                               onChange={formik.handleChange}
                               onBlur={formik.handleBlur}
