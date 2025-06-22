@@ -22,7 +22,7 @@ public class PreOrderService
 
         if (result.Any())
         {
-            throw new ArgumentException("Dados inválidos.");
+            throw new ArgumentException($"Dados inválidos.\n{string.Join(". ", result)}");
         }
 
         var deliveryId = DeliveryDateModel.GenerateId(preOrderRequest.DeliveryAt);
@@ -43,7 +43,7 @@ public class PreOrderService
                 InsertedAt = DateTime.UtcNow,
                 Obs = preOrderRequest.Obs,
                 OrderCode = null,
-                Product = preOrderRequest.Product.Select(p => new PreOrderProductModel()
+                Product = preOrderRequest.Products.Select(p => new PreOrderProductModel()
                 {
                     Id = Guid.NewGuid(),
                     ProductCode = p.ProductCode.Trim(),
