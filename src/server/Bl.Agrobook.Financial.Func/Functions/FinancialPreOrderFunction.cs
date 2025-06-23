@@ -26,28 +26,26 @@ public class FinancialPreOrderFunction
         _preOrderService = preOrderService;
     }
 
-    [Function("FinancialPreOrderCreation")]
-    public async Task<IActionResult> RunFinancialPreOrderCreation(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/preorder")] HttpRequest req,
+    [Function("FinancialPreOrder")]
+    public async Task<IActionResult> RunFunc(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", "get", Route = "financial/preorder")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
 
         try
         {
-            var model = await JsonSerializer.DeserializeAsync<Model.CreatePreOrderModel>(req.Body, new JsonSerializerOptions
+            if (req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
-                Converters = { new DateOnlyJsonConverter() }
-            });
+                return await RunFinancialPreOrderQuery(req, cancellationToken);
+            }
+            else if (req.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+            {
+                return await RunFinancialPreOrderCreation(req, cancellationToken);
+            }
 
-            ArgumentNullException.ThrowIfNull(model, nameof(model));
-
-            var resp = await _preOrderService.InsertPreOrderAsync(model);
-
-            return new CreatedResult(
-                $"/api/financial/preorder/{resp.Id}",
-                new { Id = resp.Id, Message = "Pré-pedido inserido com sucesso." });
+            return new BadRequestObjectResult("Only GET and POST methods are supported");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e, "Failed to insert pre-order.");
             return new BadRequestObjectResult(
@@ -55,9 +53,28 @@ public class FinancialPreOrderFunction
         }
     }
 
-    [Function("FinancialPreOrderQuery")]
+    public async Task<CreatedResult> RunFinancialPreOrderCreation(
+        HttpRequest req,
+        CancellationToken cancellationToken = default)
+
+    {
+
+        var model = await JsonSerializer.DeserializeAsync<Model.CreatePreOrderModel>(req.Body, new JsonSerializerOptions
+        {
+            Converters = { new DateOnlyJsonConverter() }
+        });
+
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
+        var resp = await _preOrderService.InsertPreOrderAsync(model);
+
+        return new CreatedResult(
+            $"/api/financial/preorder/{resp.Id}",
+            new { Id = resp.Id, Message = "Pré-pedido inserido com sucesso." });
+    }
+
     public async Task<IActionResult> RunFinancialPreOrderQuery(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "financial/preorder")] HttpRequest req,
+        HttpRequest req,
         CancellationToken cancellationToken = default)
     {
         if (!_authService.IsAuthenticated(req))
@@ -65,23 +82,14 @@ public class FinancialPreOrderFunction
             return new UnauthorizedResult();
         }
 
-        try
-        {
-            var deliveryDate = req.Query["deliveryDate"].ToString();
-            if (deliveryDate is null || 
-                DateOnly.TryParseExact(deliveryDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
-                return new BadRequestObjectResult(
-                    new { Message = "Erro ao consultar. Parâmetros inválidos." });
-
-            var resp = await _preOrderService.GetByDeliveryDateAsync(dt, cancellationToken);
-
-            return new OkObjectResult(resp);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to get pre-orders.");
+        var deliveryDate = req.Query["deliveryDate"].ToString();
+        if (deliveryDate is null ||
+            DateOnly.TryParseExact(deliveryDate, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var dt))
             return new BadRequestObjectResult(
-                new { Message = "Erro ao consultar." });
-        }
+                new { Message = "Erro ao consultar. Parâmetros inválidos." });
+
+        var resp = await _preOrderService.GetByDeliveryDateAsync(dt, cancellationToken);
+
+        return new OkObjectResult(resp);
     }
 }

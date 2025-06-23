@@ -2,7 +2,7 @@
   "profiles": {
     "Bl.Agrobook.Financial.Func": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7082 --functions FinancialPreOrderCreation GetAllProductsFunction"
+      "commandLineArgs": "--port 7082 --functions FinancialPreOrder"
     }
   }
 }
