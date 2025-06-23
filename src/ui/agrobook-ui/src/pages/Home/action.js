@@ -1,5 +1,45 @@
 import api from '../../api/AzFunApi'
 
+export const createPreOrder = async (request) => {
+
+    if (!request || !Array.isArray(request.products)) {
+        return;
+    }
+
+    const response = await api.post(
+        'api/financial/preorder',
+        {
+            CustomerPhone: request.customerPhone,
+            CustomerEmail: request.customerEmail,
+            CustomerName: request.customerName,
+            Products: request.products.map(x => ({
+                ProductCode: x.code,
+                ProductName: x.name,
+                Quantity: x.qtt,
+            })),
+            DeliveryAt: request.deliveryAt,
+            Obs: undefined
+        },
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            responseType: 'blob'
+        });
+
+    if (response.status !== 201){
+        return {
+            Status: Status.Error,
+            Result: "Falha ao inserir pré cadastro."
+        }
+    }
+
+    return {
+        Status: Status.Ok,
+        Result: ({ createId: response.data.id })
+    }
+}
+
 export const getProducts = async () => {
     let response = await api.get('api/product')
 

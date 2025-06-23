@@ -4,7 +4,7 @@ import ProductCardItem from "../../components/ProductCardItem"
 import ScrollToTopButton from "../../components/ScrollToTopButton"
 import ConfirmOrderModal from "../../components/ConfirmOrderModal"
 import { PaginableList } from "../../utils/PaginableList"
-import { getProducts, Status } from "./action";
+import { getProducts, Status, createPreOrder } from "./action";
 
 function Home() {
     const [pageData, setPageData] = useState({
@@ -14,6 +14,14 @@ function Home() {
         alertMessage: { success: true, message: '', timeout: undefined }
     })
     const [shouldShowModalConfirmation, setShouldShowModalConfirmation] = useState(false);
+    const [textProductsFilter, setTextProductsFilter] = useState('');
+
+    useEffect(
+        () => {
+            handleTextProdFilter()
+        },
+        [textProductsFilter]
+    )
 
     useEffect(
         () => {
@@ -50,7 +58,7 @@ function Home() {
             if (product.resetKey)
                 product.resetKey += 1;
             else
-                product.resetKey = 0;
+                product.resetKey = 1;
         });
         pageData.cartItems.clear();
         setPageData(p => ({
@@ -92,8 +100,100 @@ function Home() {
         }));
     }
 
-    const handleOrderConfirmation = (orders) => {
-        // TODO: handle order confirmation
+    const handleOrderConfirmation = async (orders) => {
+
+        try {
+            let response = await createPreOrder(orders);
+
+            if (response.Status == Status.Error) {
+                setPageData(p => ({
+                    ...p,
+                    alertMessage: ({ success: false, message: response.Result })
+                }));
+                return;
+            }
+
+            removeAllCartProducts();
+            setPageData(p => ({
+                ...p,
+                alertMessage: ({ success: true, message: "Pedido adicionado com sucesso." })
+            }));
+        } finally {
+
+            setShouldShowModalConfirmation(false);
+        }
+    }
+
+    const handleChangeToPage = (pageNumber) => {
+        pageNumber = parseInt(pageNumber)
+        if (pageNumber < 1 || pageNumber > pageData.items.TotalPageQuantity) {
+            console.warn(`Invalid page ${pageNumber}.`)
+            return;
+        }
+
+        pageData.items.ChangePage(pageNumber);
+        setPageData(p => ({
+            ...p
+        }))
+    }
+
+    const handleOpenModal = () => {
+        if (pageData.cartItems.size == 0) {
+            setPageData(p => ({
+                ...p,
+                alertMessage: { message: "Selecione produtos para o carrinho.", success: false, timeout: 5000 }
+            }))
+            return;
+        }
+
+        setShouldShowModalConfirmation(true)
+    }
+
+    const handleModalClose = () => {
+        setShouldShowModalConfirmation(false)
+    }
+
+    const handleTextProdFilter = () => {
+        let searchInput = textProductsFilter?.toLowerCase()?.trim();
+        if (!searchInput || searchInput.length < 2) {
+            pageData.items.UpdateItems(
+                pageData.allItems
+            )
+            setPageData(p => ({
+                ...p
+            }))
+            return;
+        }
+        pageData.items.UpdateItems(
+            pageData.allItems.filter(x => ("" + x.name).toLowerCase().includes(searchInput))
+        )
+        setPageData(p => ({
+            ...p
+        }))
+    }
+
+    const getPageNumberList = () => {
+        let currentPage = pageData.items.CurrentPage;
+        let totalPages = pageData.items.TotalPageQuantity;
+        let showStart = totalPages > 5 && currentPage - 2 > 1
+        let showEnd = totalPages > 5 && currentPage + 3 <= totalPages
+        if (totalPages > 5 && currentPage > 3)
+            return [
+                ({ number: currentPage - 1, view: `Anterior`, enabled: currentPage > 1 }),
+                ({ number: 1, view: `...`, enabled: showStart }),/**start */
+                ({ number: currentPage, view: `${currentPage}`, enabled: true }),
+                ({ number: currentPage + 1, view: `${currentPage + 1}`, enabled: currentPage + 1 <= totalPages }),
+                ({ number: currentPage + 2, view: `${currentPage + 2}`, enabled: currentPage + 2 <= totalPages }),
+                ({ number: totalPages, view: `...`, enabled: showEnd }),/**end */
+                ({ number: currentPage + 1, view: `Próxima`, enabled: currentPage + 1 <= totalPages }),
+            ]
+        return [
+            ({ number: currentPage - 1, view: `Anterior`, enabled: currentPage > 1 }),
+            ({ number: currentPage, view: `${currentPage}`, enabled: true }),
+            ({ number: currentPage + 1, view: `${currentPage + 1}`, enabled: currentPage + 1 <= totalPages }),
+            ({ number: currentPage + 2, view: `${currentPage + 2}`, enabled: currentPage + 2 <= totalPages }),
+            ({ number: currentPage + 1, view: `Próxima`, enabled: currentPage + 1 <= totalPages }),
+        ]
     }
 
     return (
@@ -107,7 +207,7 @@ function Home() {
                             <div className="card-body">
                                 <h5 className="card-title">Meus pedidos</h5>
 
-                                <div style={{ maxHeight: "300px", minHeight: "100px", overflowY: "auto" }}>
+                                <div className="overflow-auto" style={{ maxHeight: "45vh", minHeight: "45vh" }}>
                                     <ul className="list-group">
 
                                         {pageData.cartItems.entries().map(([key, cartItem]) => <>
@@ -122,7 +222,7 @@ function Home() {
                                     </ul>
                                 </div>
 
-                                <button className="btn btn-primary w-100 mt-3" onClick={(() => setShouldShowModalConfirmation(true))}>Finalizar pedido</button>
+                                <button className="btn btn-primary w-100 mt-3" onClick={(() => handleOpenModal())}>Finalizar pedido</button>
                                 <button className="btn btn-outline-secondary w-100 mt-2" onClick={removeAllCartProducts}>Limpar</button>
                             </div>
                         </div>
@@ -132,20 +232,17 @@ function Home() {
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Busque os produtos..." />
-                                    <button className="btn btn-primary" type="button">
+                                    <input type="text" className="form-control" placeholder="Busque os produtos..." value={textProductsFilter} onInput={e => setTextProductsFilter(e.target.value)} />
+                                    <button className="btn btn-primary" type="button" onClick={handleTextProdFilter}>
                                         <i className="bi bi-search"></i>
                                     </button>
                                 </div>
                             </div>
                             <div className="col-md-6 text-md-end">
                                 <div className="dropdown d-inline-block me-2">
-                                    <button className="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                                        Ordenar por: Nome
+                                    <button className="btn btn-outline-primary disabled" type="button">
+                                        <small>{pageData.items.getLength} produtos encontrados</small>
                                     </button>
-                                    <ul className="dropdown-menu">
-                                        <li><a className="dropdown-item" href="#">Nome</a></li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -157,25 +254,26 @@ function Home() {
                                         description={i.description}
                                         quantity={undefined}
                                         title={i.name}
+                                        imgUrl={i.imgUrl}
                                         onItemChanged={(qtt) => addCartProduct(i, qtt)} />
                                 </div>
                             })}
                         </div>
 
                         {pageData.items.TotalPageQuantity > 1
-                            ? <nav aria-label="Page navigation">
-                                <ul className="pagination justify-content-center">
-                                    <li className="page-item disabled">
-                                        <a className="page-link" href="#" tabIndex="-1">Anterior</a>
-                                    </li>
-                                    <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                    <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                    <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                    <li className="page-item">
-                                        <a className="page-link" href="#">Próxima</a>
-                                    </li>
-                                </ul>
-                            </nav>
+                            ? <>
+                                <nav aria-label="Page navigation">
+                                    <ul className="pagination justify-content-center">
+                                        {getPageNumberList().map((page, idx) => <>
+                                            <li className={page.number == pageData.items.CurrentPage ? "page-item active" : "page-item"} key={idx}>
+                                                <a className={page.enabled ? "page-link" : "page-link disabled"} href="#" tabIndex="-1" onClick={() => handleChangeToPage(page.number)}>
+                                                    {page.view}
+                                                </a>
+                                            </li>
+                                        </>)}
+                                    </ul>
+                                </nav>
+                            </>
                             : <></>}
 
                         {/**TODO: add ConfirmOrderModal */}
@@ -185,14 +283,19 @@ function Home() {
                 </div>
             </div>
 
-            <ConfirmOrderModal 
-                products={pageData.cartItems.entries().map(([key, x]) => ({
-                    code: x.product.code,
-                    name: x.product.name,
-                    qtt: x.qtt,
-                }))}
-                show={shouldShowModalConfirmation}
-                onConfirm={handleOrderConfirmation}/>
+            {shouldShowModalConfirmation
+                ? <>
+                    <ConfirmOrderModal
+                        products={pageData.cartItems.entries().map(([key, x]) => ({
+                            code: x.product.code,
+                            name: x.product.name,
+                            qtt: x.qtt,
+                        }))}
+                        show={shouldShowModalConfirmation}
+                        onClose={handleModalClose}
+                        onConfirm={handleOrderConfirmation} />
+                </>
+                : <></>}
         </>
     );
 }

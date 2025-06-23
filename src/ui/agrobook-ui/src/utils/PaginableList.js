@@ -20,6 +20,10 @@ export class PaginableList {
     return Math.ceil(this._items.length / this._itemsPerPage);
   }
 
+  // Get total items
+  get getLength() {
+    return this._items.length;
+  }
   // Get items currently visible on the page
   get CurrentShowedItems() {
     const startIndex = (this._currentPage - 1) * this._itemsPerPage;

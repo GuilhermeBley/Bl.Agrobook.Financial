@@ -60,7 +60,8 @@ export const generatePdf = async (orderDate) => {
         const response = await api.post(
             'api/financial/order/pdf',
             {
-                orderDate: orderDate
+                orderDate: orderDate,
+                orderCreatedAt: "2025-06-08"
             },
             {
                 headers: {
