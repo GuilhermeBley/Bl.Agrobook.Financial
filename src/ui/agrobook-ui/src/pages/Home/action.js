@@ -9,16 +9,16 @@ export const createPreOrder = async (request) => {
     const response = await api.post(
         'api/financial/preorder',
         {
-            customerPhone: request.customerPhone,
-            customerEmail: request.customerEmail,
-            customerName: request.customerName,
-            product: request.products.map(x => ({
-                productCode: x.code,
-                productName: x.name,
-                quantity: x.qtt,
+            CustomerPhone: request.customerPhone,
+            CustomerEmail: request.customerEmail,
+            CustomerName: request.customerName,
+            Products: request.products.map(x => ({
+                ProductCode: x.code,
+                ProductName: x.name,
+                Quantity: x.qtt,
             })),
-            deliveryAt: request.deliveryAt,
-            obs: undefined
+            DeliveryAt: request.deliveryAt,
+            Obs: undefined
         },
         {
             headers: {
