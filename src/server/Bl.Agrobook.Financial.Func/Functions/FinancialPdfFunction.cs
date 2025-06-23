@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.Text.Json.Nodes;
 
 namespace Bl.Agrobook.Financial.Func.Functions;
@@ -29,7 +30,7 @@ internal class FinancialPdfFunction
 
     [Function("GeneratePdf")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "financial/order/pdf")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "financial/order/pdf")] HttpRequest req,
         CancellationToken cancellationToken = default)
     {
         if (!_authService.IsAuthenticated(req))
@@ -49,12 +50,21 @@ internal class FinancialPdfFunction
             catch { }
 
             var date = data?["orderDate"]?.ToString();
+            var orderRequisitionDate = data?["orderCreatedAt"]?.ToString();
+
+            if (!DateTime.TryParseExact(orderRequisitionDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var orderRequisition))
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Message = "Adicione a data 'orderCreatedAt' no corpo da requisição."
+                });
+            }
 
             if (string.IsNullOrEmpty(date)) date = $"{DateTime.Now.ToString("dd/MM/yyyy")}";
 
             var orders = await _api.GetOrdersAsync().ToListAsync(cancellationToken);
 
-            if (orders.Count == 0) return new OkObjectResult("No orders found.");
+            if (orders.Count == 0) return new NoContentResult();
 
             using var memoryStream = new MemoryStream();
 
@@ -71,9 +81,16 @@ internal class FinancialPdfFunction
 
             // Create a table with two columns for the two-side layout
             var table = new Table(2).UseAllAvailableWidth();
+            HashSet<string> codesAdded = new(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var order in orders.OrderBy(o => o.Products.Count))
+            foreach (var order in orders.Where(x => x.Date >= orderRequisition).OrderBy(o => o.Products.Count))
             {
+                if (!codesAdded.Add(order.Code))
+                {
+                    _logger.LogInformation("Code {0} already added.", order.Code);
+                    continue;
+                }
+
                 // Create a cell for the left or right side
                 var cell = new Cell()
                     .SetKeepTogether(true)
@@ -99,6 +116,16 @@ internal class FinancialPdfFunction
 
                 cell.Add(list);
 
+                order.Obs = order.Obs?.Replace("Venda isenta de impostos ", "");
+
+                if (!string.IsNullOrEmpty(order.Obs) &&
+                    !order.Obs.Contains("Venda isenta de impostos", StringComparison.OrdinalIgnoreCase))
+                {
+                    cell.Add(new Paragraph($"Obs: {order.Obs}")
+                        .SetFontSize(9)
+                        .SetMarginTop(5));
+                }
+
                 // Add the cell to the table
                 table.AddCell(cell);
             }
@@ -107,6 +134,8 @@ internal class FinancialPdfFunction
             document.Add(table);
 
             document.Close();
+
+            File.WriteAllBytes($"C:\\Users\\tabat\\Downloads\\Pedidos - 2025-05-04.pdf", memoryStream.ToArray());
 
             await Task.CompletedTask;
 

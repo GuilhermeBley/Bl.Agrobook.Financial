@@ -121,12 +121,12 @@ public class FinancialApiService
 
         var userInfo = await EnsureApiAuthenticatedAsync(cancellationToken);
 
+        var jsontext = JsonSerializer.Serialize(order, options: _jsonSerializerOptions);
+        
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/v1/order/{userInfo.ShopCode}")
         {
             // add the body            
-            Content = JsonContent.Create(
-                order,
-                options: _jsonSerializerOptions)
+            Content = JsonContent.Create(order, options: _jsonSerializerOptions)
         };
 
         var response = await _client.SendAsync(request, cancellationToken);

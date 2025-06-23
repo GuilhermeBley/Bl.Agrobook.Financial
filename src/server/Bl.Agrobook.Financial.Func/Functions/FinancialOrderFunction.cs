@@ -219,11 +219,11 @@ public class FinancialOrderFunction
                         Products = new(),
                         ProratedDiscount = 0,
                         Qty = 0,
-                        Seller = Seller.Default,
+                        Seller = SellerViewModel.Default,
                         Shopcode = customer.Shopcode,
-                        Status = 3,
-                        Tax = Tax.Default,
-                        Transporter = Transporter.Empty,
+                        Status = 1,
+                        Tax = TaxViewModel.Default,
+                        Transporter = TransporterViewModel.Empty,
                         Uid = Guid.NewGuid().ToString(),
                         UsedCredit = 0,
                         Customer = new()
@@ -238,15 +238,23 @@ public class FinancialOrderFunction
                         }
                     };
                 }
+
                 var product = products.FirstOrDefault(p => p.Code == order.ProductCode.ToString());
 
                 ArgumentNullException.ThrowIfNull(product, $"Product with code {order.ProductCode} not found.");
 
                 var o = ordersByCustomer[order.CustomerCode];
+
+                if (!string.IsNullOrWhiteSpace(order.ObsPedido))
+                {
+                    var obss = new string?[] { o.Obs?.Trim('.'), order.ObsPedido.Trim(' ', '.', ',', '\n') + "." };
+                    o.Obs = string.Join(", ", obss.Where(e => !string.IsNullOrEmpty(e)));
+                }
+
                 o.Products.Add(new()
                 {
                     Uid = product.Uid,
-                    Tax = Tax.Default,
+                    Tax = TaxViewModel.Default,
                     Shopcode = product.Shopcode,
                     Active = true,
                     AutoPrice = false,
@@ -274,8 +282,8 @@ public class FinancialOrderFunction
                     FractionalSale = false,
                     GrossWeigth = 0,
                     HasStock = product.HasStock,
-                    Id = 0,
-                    Image = Image.Default,
+                    Id = product.Id,
+                    Image = ImageViewModel.Default,
                     ImageUrl = string.Empty,
                     Inactive = false,
                     IsPriceEdited = true, // use the price from the CSV
@@ -292,7 +300,7 @@ public class FinancialOrderFunction
                     ProfitMargin = 0,
                     Promotional = false,
                     ProratedDiscount = 0,
-                    Published = false,
+                    Published = true,
                     Qty = order.Quantity,
                     ReservedStock = product.ReservedStock,
                     Stock = product.Stock,
@@ -302,7 +310,7 @@ public class FinancialOrderFunction
                     Subcategory = product.Subcategory,
                     Suppliers = new(),
                     TaxDetails = new(),
-                    TaxUseGlobal = false,
+                    TaxUseGlobal = true,
                     Unit = product.Unit,
                     UnitPrice = 0,
 
