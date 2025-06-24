@@ -108,9 +108,10 @@ internal class FinancialPdfFunction
 
                 foreach (var product in order.Products)
                 {
-                    var listItem = new ListItem($"□ {product.Description} - {product.Qty?.ToString("0")}");
+                    var listItem = new ListItem(
+                        $"□ {product.Description} - {product.Qty?.ToString("0")}" + 
+                        (string.IsNullOrWhiteSpace(product.Obs) ? "" : $" ({product.Obs})"));
                     listItem.SetFontSize(10);
-
                     list.Add(listItem);
                 }
 
@@ -135,7 +136,7 @@ internal class FinancialPdfFunction
 
             document.Close();
 
-            File.WriteAllBytes($"C:\\Users\\tabat\\Downloads\\Pedidos - 2025-05-04.pdf", memoryStream.ToArray());
+            File.WriteAllBytes($"C:\\Users\\tabat\\Downloads\\Pedidos - 2025-06-25.pdf", memoryStream.ToArray());
 
             await Task.CompletedTask;
 

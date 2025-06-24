@@ -251,6 +251,11 @@ public class FinancialOrderFunction
                     o.Obs = string.Join(", ", obss.Where(e => !string.IsNullOrEmpty(e)));
                 }
 
+                if (string.IsNullOrWhiteSpace(order.ObsProduto))
+                {
+                    order.ObsProduto = string.Empty;
+                }
+
                 o.Products.Add(new()
                 {
                     Uid = product.Uid,
@@ -291,7 +296,7 @@ public class FinancialOrderFunction
                     Localization = string.Empty,
                     NetWeigth = 0,
                     NoTax = false,
-                    Obs = string.Empty,
+                    Obs = order.ObsProduto,
                     Payd = 0,
                     PercentageDiscount = 0,
                     PercentualSale = false,
