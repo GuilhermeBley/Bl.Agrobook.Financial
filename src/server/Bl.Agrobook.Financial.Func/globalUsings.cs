@@ -1,0 +1,1 @@
+global using Bl.Agrobook.Financial.Func.Exceptions;
