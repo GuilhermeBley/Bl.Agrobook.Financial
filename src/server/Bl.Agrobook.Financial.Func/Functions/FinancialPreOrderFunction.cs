@@ -45,6 +45,13 @@ public class FinancialPreOrderFunction
 
             return new BadRequestObjectResult("Only GET and POST methods are supported");
         }
+        catch (ApiException e)
+        {
+            return new BadRequestObjectResult(new
+            {
+                ErrorResponses = e.ErrorResponses
+            });
+        }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to insert pre-order.");
