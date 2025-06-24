@@ -22,7 +22,7 @@ public class PreOrderService
 
         if (result.Any())
         {
-            throw new ArgumentException($"Dados inválidos.\n{string.Join(". ", result)}");
+            throw new ApiException(result);
         }
 
         var deliveryId = DeliveryDateModel.GenerateId(preOrderRequest.DeliveryAt);
