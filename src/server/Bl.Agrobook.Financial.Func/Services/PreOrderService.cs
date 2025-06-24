@@ -28,7 +28,10 @@ public class PreOrderService
         var deliveryId = DeliveryDateModel.GenerateId(preOrderRequest.DeliveryAt);
         if ((await _deliveryDateRepository.GetPreOrderByIdAsync(deliveryId, cancellationToken)) is null)
         {
-            throw new ArgumentException($"Data de entrega de produtos ainda indisponíveis para dia ${preOrderRequest.DeliveryAt:dd/MM/yyyy}.");
+            throw new ApiException(
+                ApiErrorResult<CreatePreOrderModel>.Create(
+                    $"Data de entrega de produtos indisponíveis para dia {preOrderRequest.DeliveryAt:dd/MM/yyyy}.",
+                    p => p.DeliveryAt));
         }
 
         var model =
