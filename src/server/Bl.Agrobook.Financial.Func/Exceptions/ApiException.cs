@@ -13,8 +13,11 @@ public class ApiException : Exception
     /// </summary>
     public List<object> ErrorResponses { get; }
 
-    public ApiException(IEnumerable<object> errorResponses)
-        : this(HttpStatusCode.BadRequest, errorResponses) { }
+    public ApiException(object singleError, HttpStatusCode statusCode = HttpStatusCode.BadRequest) 
+        : this(statusCode, errorResponses: [singleError]) { }
+
+    public ApiException(IEnumerable<object> errorResponses, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+        : this(statusCode, errorResponses) { }
 
     public ApiException(HttpStatusCode statusCode, IEnumerable<object> errorResponses)
         : this(statusCode, errorResponses, innerException: null) { }
