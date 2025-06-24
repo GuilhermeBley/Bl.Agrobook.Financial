@@ -74,6 +74,7 @@ public class CsvOrderReader
             Map(m => m.ProductCode).Name("Codigo do produto");
             Map(m => m.Quantity).Name("Quantidade");
             Map(m => m.Price).Name("Preco");
+            Map(m => m.ObsProduto).Name("Obs Produto");
             Map(m => m.ObsPedido).Name("Obs Pedido");
         }
     }
