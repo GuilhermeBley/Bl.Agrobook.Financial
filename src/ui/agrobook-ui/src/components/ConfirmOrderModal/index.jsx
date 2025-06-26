@@ -3,22 +3,16 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { UserStorageService } from '../../services/UserStorageService'
 
-const getDeliveryRange = () => {
-  let minDate = new Date();
-  let maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 14);
-  return {
-    minDate,
-    maxDate
-  }
-}
-
 const OrderConfirmationModal = ({
   products = [],
   show,
   onClose,
   onConfirm
 }) => {
+  const [modalInfo, setModalInfo] = useState(({
+    isInitializing: true,
+    availableDeliveryDates: []
+  }));
   const storeService = new UserStorageService();
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -34,7 +28,51 @@ const OrderConfirmationModal = ({
         'Número de telefone inválido'
       )
       .required('Telefone é obrigatório'),
+    deliveryAt: Yup.date()
+      .required('Date is required')
+      .test(
+        'Data disponível para coleta',
+        'Data não disponível para coleta, selecione outra data.',
+        (value) => {
+          if (!value) return true;
+          const dateStr = value.toISOString().split('T')[0];
+          return !modalInfo.availableDeliveryDates.includes(dateStr);
+        }
+      )
   });
+  const populateDeliveryDates = async () => {
+
+  }
+
+  useEffect(() => {
+
+    try {
+      populateDeliveryDates();
+    }
+    finally {
+      setModalInfo(r => ({
+        ...r,
+        isInitializing: false
+      }))
+    }
+
+  }, [])
+
+
+  const getDeliveryRange = () => {
+    if (!modalInfo || modalInfo.availableDeliveryDates.length === 0) {
+      return {
+        minDate: undefined,
+        maxDate: undefined
+      }
+    }
+
+    return {
+      minDate: new Date(Math.min(modalInfo.availableDeliveryDates)),
+      maxDate: new Date(Math.max(modalInfo.availableDeliveryDates))
+    }
+  }
+
 
   var userInfo = storeService.getUserInfo();
   const formik = useFormik({
@@ -151,17 +189,32 @@ const OrderConfirmationModal = ({
                         <div className='col-md-4'>
                           <div className="mb-1">
                             <label className="form-label">Data de coleta</label>
-                            <input
-                              id="inputDeliveryAt"
-                              name="inputDeliveryAt"
-                              type="date"
-                              min={getDeliveryRange().minDate.toISOString().split('T')[0]}
-                              max={getDeliveryRange().maxDate.toISOString().split('T')[0]}
-                              className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              value={formik.values.deliveryAt}
-                            />
+                            {modalInfo.availableDeliveryDates.length === 0
+                              ? <>
+                                <input
+                                  id="inputDeliveryAt"
+                                  name="inputDeliveryAt"
+                                  type="text"
+                                  disabled
+                                  className={`form-control`}
+                                  title='Nenhuma data disponível para coleta das mercadorias, contate o comercial.'
+                                  placeholder='Nenhuma data disponível'
+                                />
+                              </>
+                              : <>
+                                <input
+                                  id="inputDeliveryAt"
+                                  name="inputDeliveryAt"
+                                  type="date"
+                                  min={getDeliveryRange().minDate?.toISOString().split('T')[0] ?? ''}
+                                  max={getDeliveryRange().maxDate?.toISOString().split('T')[0] ?? ''}
+                                  className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  value={formik.values.deliveryAt}
+                                />
+                              </>}
+
                             {formik.touched.phone && formik.errors.phone ? (
                               <div className="invalid-feedback">{formik.errors.phone}</div>
                             ) : null}
