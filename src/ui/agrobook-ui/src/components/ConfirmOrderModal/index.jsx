@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { UserStorageService } from '../../services/UserStorageService'
+import { getAllDeliveryDatesAsync } from './action';
 
 const OrderConfirmationModal = ({
   products = [],
@@ -41,7 +42,20 @@ const OrderConfirmationModal = ({
       )
   });
   const populateDeliveryDates = async () => {
+    try{
+      var r = await getAllDeliveryDatesAsync();
 
+      if (!Array.isArray(r.Result)){
+        return;
+      }
+
+      setModalInfo(r => ({
+        ...r,
+        availableDeliveryDates: [...r.Result]
+      }))
+    }catch(e){
+      console.error(e)
+    }
   }
 
   useEffect(() => {
