@@ -42,10 +42,10 @@ const OrderConfirmationModal = ({
       )
   });
   const populateDeliveryDates = async () => {
-    try{
+    try {
       var r = await getAllDeliveryDatesAsync();
 
-      if (!Array.isArray(r.Result)){
+      if (!Array.isArray(r.Result)) {
         return;
       }
 
@@ -53,7 +53,7 @@ const OrderConfirmationModal = ({
         ...r,
         availableDeliveryDates: [...r.Result]
       }))
-    }catch(e){
+    } catch (e) {
       console.error(e)
     }
   }
@@ -145,6 +145,16 @@ const OrderConfirmationModal = ({
                 <div className="card-body">
                   <form onSubmit={formik.handleSubmit}>
                     <div id='user-info' className='overflow-auto' style={({ maxHeight: "60vh" })}>
+
+                      {modalInfo.availableDeliveryDates.length == 0
+                        ? <>
+                          <div className="mb-1 w-100">
+                            <span className='text-danger text-center'>Não há datas de coleta do produto disponíveis, aguarde ou contate o vendedor.</span>
+                          </div>
+                        </>
+                        : <>
+
+                        </>}
 
                       <div className="mb-1">
                         <label htmlFor="name" className="form-label">Nome completo</label>
@@ -269,7 +279,8 @@ const OrderConfirmationModal = ({
                       <button
                         type="submit"
                         className="btn btn-primary"
-                        disabled={formik.isSubmitting}
+                        title={modalInfo.availableDeliveryDates.length == 0 ? "Nenhuma data de coleta disponível." : "Realizar pedido."}
+                        disabled={(formik.isSubmitting || modalInfo.availableDeliveryDates.length == 0)}
                       >
                         {formik.isSubmitting ? 'Finalizando...' : 'Finalizar Pedido'}
                       </button>
