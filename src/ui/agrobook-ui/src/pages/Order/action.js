@@ -102,6 +102,42 @@ export const generatePdf = async (orderDate) => {
     }
 }
 
+export const getPreOrders = async () => {
+    let response = await api.get('api/financial/preorder')
+
+    if (response.status === 401) {
+        return {
+            Status: Status.Unauthorized,
+            Result: "Não autorizado"
+        }
+    }
+
+    if (response.status !== 200 ||
+        !Array.isArray(response.data)) {
+
+        console.log(response.data)
+        return {
+            Status: Status.Error,
+            Result: "Falha ao coletar dados."
+        }
+    }
+
+    try {
+
+        return {
+            Status: Status.Ok,
+            Result: response.data
+        }
+    }
+    catch (e) {
+        console.error("Failed to get product data.", e)
+        return {
+            Status: Status.Error,
+            Result: "Falha ao coletar dados dos produtos."
+        }
+    }
+}
+
 export const Status = {
     Unauthorized: 'Não autorizado',
     Ok: 'Ok',

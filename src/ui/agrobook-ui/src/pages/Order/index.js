@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
-import { postFileAsync, Status, generatePdf } from "./action"
+import { postFileAsync, Status, generatePdf, getPreOrders } from "./action"
 import SingleAlertComponent from "../../components/SingleAlertComponent"
 import PreOrderTable from "./PreOrderTableComponenet";
 
@@ -15,6 +15,22 @@ function Order() {
         alertMessage: { success: true, message: '', timeout: undefined },
         preOrders: [],
     })
+
+    useEffect(() => {
+        const setPreOrders = async () => {
+            let preOrders = await getPreOrders();
+
+            if (preOrders.Status == Status.Ok)
+            {
+                setPageData(p => ({
+                    ...p,
+                    preOrders: preOrders.Result
+                }))
+            }
+        }
+
+        Promise.all([setPreOrders()]);
+    },[])
 
     const handleFileChange = (event) => {
         setPageData(p => ({
@@ -199,7 +215,7 @@ function Order() {
                         </button>
                     </div>
 
-                    <PreOrderTable data={[]} />
+                    <PreOrderTable data={pageData.preOrders} />
                 </div>
             </div>
 
