@@ -2,6 +2,7 @@ import { useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
 import { postFileAsync, Status, generatePdf } from "./action"
 import SingleAlertComponent from "../../components/SingleAlertComponent"
+import PreOrderTable from "./PreOrderTableComponenet";
 
 function Order() {
 
@@ -11,7 +12,8 @@ function Order() {
         fileUploading: false,
         isDowloadingPdf: false,
         currentPdfDate: undefined,
-        alertMessage: { success: true, message: '', timeout: undefined }
+        alertMessage: { success: true, message: '', timeout: undefined },
+        preOrders: [],
     })
 
     const handleFileChange = (event) => {
@@ -196,6 +198,8 @@ function Order() {
                             <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         </button>
                     </div>
+
+                    <PreOrderTable data={[]} />
                 </div>
             </div>
 
