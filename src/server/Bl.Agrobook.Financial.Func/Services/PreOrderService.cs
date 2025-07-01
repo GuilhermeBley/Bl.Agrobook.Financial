@@ -95,4 +95,16 @@ public class PreOrderService
             UserId = userEmail.Trim(),
         },cancellationToken);
     }
+
+    public async Task DeleteDeliveryDateAsync(
+        DateOnly deliveryDate,
+        string userEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var id = DeliveryDateModel.GenerateId(deliveryDate);
+        var alreadyAdded = await _deliveryDateRepository.GetByIdAsync(id);
+        if (alreadyAdded is not null) return;
+
+        await _deliveryDateRepository.DeleteAsync(id, cancellationToken);
+    }
 }

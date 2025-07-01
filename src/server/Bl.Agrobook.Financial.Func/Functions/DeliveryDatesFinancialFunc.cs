@@ -39,8 +39,12 @@ public class DeliveryDatesFinancialFunc
             {
                 return await RunFinancialDeliveryDateCreation(req, cancellationToken);
             }
+            else if (req.Method.Equals("DELETE", StringComparison.OrdinalIgnoreCase))
+            {
+                return await RunFinancialDeliveryDateDeletion(req, cancellationToken);
+            }
 
-            return new BadRequestObjectResult("Only GET and POST methods are supported");
+            return new BadRequestObjectResult("Only DELETE, GET and POST methods are supported");
         }
         catch (ApiException e)
         {
@@ -53,7 +57,7 @@ public class DeliveryDatesFinancialFunc
         {
             _logger.LogError(e, "Failed to insert delivery date.");
             return new BadRequestObjectResult(
-                new { Message = "Erro ao inserir data de coleta." });
+                new { Message = "Erro executar operação." });
         }
     }
 
@@ -83,5 +87,20 @@ public class DeliveryDatesFinancialFunc
         await _preOrderService.CreateDeliveryDateAsync(dd, "api@email.com", cancellationToken);
 
         return new CreatedResult("api/financial/delivery-dates", new { DeliveryDate = dd });
+    }
+
+    private async Task<IActionResult> RunFinancialDeliveryDateDeletion(HttpRequest req, CancellationToken cancellationToken = default)
+    {
+        if (!_authService.IsAuthenticated(req)) return new UnauthorizedResult();
+
+        if (req.Query.TryGetValue("deliveryDate", out var deliveryDateStr) == false ||
+            !DateOnly.TryParse(deliveryDateStr, out var parsedDd))
+        {
+            return new BadRequestObjectResult("Invalid delivery date query parameter.");
+        }
+
+        await _preOrderService.DeleteDeliveryDateAsync(parsedDd, "api@email.com", cancellationToken);
+
+        return new OkResult();
     }
 }
