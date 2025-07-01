@@ -25,7 +25,7 @@ public class DeliveryDateRepository : RepositoryBase
         await collection.InsertManyAsync(model, new() { }, cancellationToken);
     }
 
-    public async Task<DeliveryDateModel> GetPreOrderByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<DeliveryDateModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var collection = GetCollection<DeliveryDateModel>(CollectionName);
         var filter = Builders<DeliveryDateModel>.Filter.Eq(p => p.Id, id);
@@ -52,5 +52,13 @@ public class DeliveryDateRepository : RepositoryBase
         var filter = Builders<DeliveryDateModel>.Filter.Eq(p => p.Id, id);
         var result = await collection.DeleteOneAsync(filter, cancellationToken);
         return result.IsAcknowledged && result.DeletedCount > 0;
+    }
+
+    public async Task<IEnumerable<DeliveryDateModel>> GetAllGreatherThanAsync(DateOnly date, CancellationToken cancellationToken = default)
+    {
+        var collection = GetCollection<DeliveryDateModel>(CollectionName);
+        var filter = Builders<DeliveryDateModel>.Filter.Eq(p => p.DeliveryAt, date);
+
+        return await collection.Find(filter).ToListAsync(cancellationToken);
     }
 }

@@ -26,7 +26,7 @@ public class PreOrderService
         }
 
         var deliveryId = DeliveryDateModel.GenerateId(preOrderRequest.DeliveryAt);
-        if ((await _deliveryDateRepository.GetPreOrderByIdAsync(deliveryId, cancellationToken)) is null)
+        if ((await _deliveryDateRepository.GetByIdAsync(deliveryId, cancellationToken)) is null)
         {
             throw new ApiException(
                 ApiErrorResult<CreatePreOrderModel>.Create(
@@ -67,5 +67,44 @@ public class PreOrderService
         var orders = await _preOrderRepository.GetByDeliveryDateAsync(deliveryDate, cancellationToken);
 
         return orders;
+    }
+
+    public async Task<DateOnly[]> GetDeliveryDatesAsync(CancellationToken cancellationToken = default)
+    {
+        var deliveryDates = await _deliveryDateRepository.GetAllGreatherThanAsync(
+            DateOnly.FromDateTime(DateTime.Now),
+            cancellationToken);
+
+        return deliveryDates.Select(x => x.DeliveryAt).ToArray();
+    }
+
+    public async Task CreateDeliveryDateAsync(
+        DateOnly deliveryDate,
+        string userEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var id = DeliveryDateModel.GenerateId(deliveryDate);
+        var alreadyAdded = await _deliveryDateRepository.GetByIdAsync(id);
+        if (alreadyAdded is not null) return;
+
+        await _deliveryDateRepository.InsertAsync(new DeliveryDateModel
+        {
+            Id = id,
+            DeliveryAt = deliveryDate,
+            InsertedAt = DateTime.UtcNow,
+            UserId = userEmail.Trim(),
+        },cancellationToken);
+    }
+
+    public async Task DeleteDeliveryDateAsync(
+        DateOnly deliveryDate,
+        string userEmail,
+        CancellationToken cancellationToken = default)
+    {
+        var id = DeliveryDateModel.GenerateId(deliveryDate);
+        var alreadyAdded = await _deliveryDateRepository.GetByIdAsync(id);
+        if (alreadyAdded is not null) return;
+
+        await _deliveryDateRepository.DeleteAsync(id, cancellationToken);
     }
 }

@@ -2,16 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { UserStorageService } from '../../services/UserStorageService'
-
-const getDeliveryRange = () => {
-  let minDate = new Date();
-  let maxDate = new Date();
-  maxDate.setDate(maxDate.getDate() + 14);
-  return {
-    minDate,
-    maxDate
-  }
-}
+import { getAllDeliveryDatesAsync } from './action';
 
 const OrderConfirmationModal = ({
   products = [],
@@ -19,6 +10,10 @@ const OrderConfirmationModal = ({
   onClose,
   onConfirm
 }) => {
+  const [modalInfo, setModalInfo] = useState(({
+    isInitializing: true,
+    availableDeliveryDates: []
+  }));
   const storeService = new UserStorageService();
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -34,7 +29,64 @@ const OrderConfirmationModal = ({
         'Número de telefone inválido'
       )
       .required('Telefone é obrigatório'),
+    deliveryAt: Yup.date()
+      .required('Date is required')
+      .test(
+        'Data disponível para coleta',
+        'Data não disponível para coleta, selecione outra data.',
+        (value) => {
+          if (!value) return true;
+          const dateStr = value.toISOString().split('T')[0];
+          return !modalInfo.availableDeliveryDates.includes(dateStr);
+        }
+      )
   });
+  const populateDeliveryDates = async () => {
+    try {
+      var r = await getAllDeliveryDatesAsync();
+
+      if (!Array.isArray(r.Result)) {
+        return;
+      }
+
+      setModalInfo(r => ({
+        ...r,
+        availableDeliveryDates: [...r.Result]
+      }))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+
+    try {
+      populateDeliveryDates();
+    }
+    finally {
+      setModalInfo(r => ({
+        ...r,
+        isInitializing: false
+      }))
+    }
+
+  }, [])
+
+
+  const getDeliveryRange = () => {
+    if (!modalInfo || modalInfo.availableDeliveryDates.length === 0) {
+      return {
+        minDate: undefined,
+        maxDate: undefined
+      }
+    }
+
+    return {
+      minDate: new Date(Math.min(modalInfo.availableDeliveryDates)),
+      maxDate: new Date(Math.max(modalInfo.availableDeliveryDates))
+    }
+  }
+
 
   var userInfo = storeService.getUserInfo();
   const formik = useFormik({
@@ -94,6 +146,16 @@ const OrderConfirmationModal = ({
                   <form onSubmit={formik.handleSubmit}>
                     <div id='user-info' className='overflow-auto' style={({ maxHeight: "60vh" })}>
 
+                      {modalInfo.availableDeliveryDates.length == 0
+                        ? <>
+                          <div className="mb-1 w-100">
+                            <span className='text-danger text-center'>Não há datas de coleta do produto disponíveis, aguarde ou contate o vendedor.</span>
+                          </div>
+                        </>
+                        : <>
+
+                        </>}
+
                       <div className="mb-1">
                         <label htmlFor="name" className="form-label">Nome completo</label>
                         <input
@@ -151,17 +213,32 @@ const OrderConfirmationModal = ({
                         <div className='col-md-4'>
                           <div className="mb-1">
                             <label className="form-label">Data de coleta</label>
-                            <input
-                              id="inputDeliveryAt"
-                              name="inputDeliveryAt"
-                              type="date"
-                              min={getDeliveryRange().minDate.toISOString().split('T')[0]}
-                              max={getDeliveryRange().maxDate.toISOString().split('T')[0]}
-                              className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
-                              onChange={formik.handleChange}
-                              onBlur={formik.handleBlur}
-                              value={formik.values.deliveryAt}
-                            />
+                            {modalInfo.availableDeliveryDates.length === 0
+                              ? <>
+                                <input
+                                  id="inputDeliveryAt"
+                                  name="inputDeliveryAt"
+                                  type="text"
+                                  disabled
+                                  className={`form-control`}
+                                  title='Nenhuma data disponível para coleta das mercadorias, contate o comercial.'
+                                  placeholder='Nenhuma data disponível'
+                                />
+                              </>
+                              : <>
+                                <input
+                                  id="inputDeliveryAt"
+                                  name="inputDeliveryAt"
+                                  type="date"
+                                  min={getDeliveryRange().minDate?.toISOString().split('T')[0] ?? ''}
+                                  max={getDeliveryRange().maxDate?.toISOString().split('T')[0] ?? ''}
+                                  className={`form-control ${formik.touched.deliveryAt && formik.errors.deliveryAt ? 'is-invalid' : ''}`}
+                                  onChange={formik.handleChange}
+                                  onBlur={formik.handleBlur}
+                                  value={formik.values.deliveryAt}
+                                />
+                              </>}
+
                             {formik.touched.phone && formik.errors.phone ? (
                               <div className="invalid-feedback">{formik.errors.phone}</div>
                             ) : null}
@@ -202,7 +279,8 @@ const OrderConfirmationModal = ({
                       <button
                         type="submit"
                         className="btn btn-primary"
-                        disabled={formik.isSubmitting}
+                        title={modalInfo.availableDeliveryDates.length == 0 ? "Nenhuma data de coleta disponível." : "Realizar pedido."}
+                        disabled={(formik.isSubmitting || modalInfo.availableDeliveryDates.length == 0)}
                       >
                         {formik.isSubmitting ? 'Finalizando...' : 'Finalizar Pedido'}
                       </button>
