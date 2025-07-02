@@ -2,6 +2,7 @@
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 using iText.Layout.Renderer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -81,11 +82,11 @@ internal class FinancialPdfFunction
 
             // Create a table with two columns for the two-side layout
             var table = new Table(2).UseAllAvailableWidth();
-            HashSet<string> codesAdded = new(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, Model.SaleHistoryViewModel> ordersAdded = new(StringComparer.OrdinalIgnoreCase);
 
             foreach (var order in orders.Where(x => x.Date >= orderRequisition).OrderBy(o => o.Products.Count))
             {
-                if (!codesAdded.Add(order.Code))
+                if (!ordersAdded.TryAdd(order.Code, order))
                 {
                     _logger.LogInformation("Code {0} already added.", order.Code);
                     continue;
@@ -134,9 +135,42 @@ internal class FinancialPdfFunction
             // Add the table to the document
             document.Add(table);
 
-            document.Close();
+            // summary
+            document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
-            File.WriteAllBytes($"C:\\Users\\tabat\\Downloads\\Pedidos - 2025-06-25.pdf", memoryStream.ToArray());
+            var productsSummary = ordersAdded
+                .SelectMany(x => x.Value.Products)
+                .GroupBy(x => new { x.Code, x.Description })
+                .Select(g => new
+                {
+                    g.Key.Code,
+                    g.Key.Description,
+                    TotalQty = g.Sum(p => p.Qty),
+                    TotalValue = g.Sum(p => p.FinalValue),
+                })
+                .OrderBy(x => x.Description);
+
+            var summaryTable = new Table(4).UseAllAvailableWidth();
+
+            // Add table headers
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Código").SimulateBold()));
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Descrição").SimulateBold()));
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()));
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Valor Total").SimulateBold()));
+
+            // Add summary data rows
+            foreach (var product in productsSummary)
+            {
+                summaryTable.AddCell(new Cell().Add(new Paragraph(product.Code ?? string.Empty)));
+                summaryTable.AddCell(new Cell().Add(new Paragraph(product.Description)));
+                summaryTable.AddCell(new Cell().Add(new Paragraph(product.TotalQty?.ToString("0") ?? "0")));
+                summaryTable.AddCell(new Cell().Add(new Paragraph(product.TotalValue?.ToString("C") ?? "R$ 0,00")));
+            }
+
+            // Add the summary table to the document
+            if (ordersAdded.Count > 0) document.Add(summaryTable);
+
+            document.Close();
 
             await Task.CompletedTask;
 
