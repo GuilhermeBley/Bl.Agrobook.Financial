@@ -2,6 +2,7 @@
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 using iText.Layout.Renderer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -81,11 +82,11 @@ internal class FinancialPdfFunction
 
             // Create a table with two columns for the two-side layout
             var table = new Table(2).UseAllAvailableWidth();
-            HashSet<string> codesAdded = new(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, Model.SaleHistoryViewModel> ordersAdded = new(StringComparer.OrdinalIgnoreCase);
 
             foreach (var order in orders.Where(x => x.Date >= orderRequisition).OrderBy(o => o.Products.Count))
             {
-                if (!codesAdded.Add(order.Code))
+                if (!ordersAdded.TryAdd(order.Code, order))
                 {
                     _logger.LogInformation("Code {0} already added.", order.Code);
                     continue;
@@ -109,7 +110,7 @@ internal class FinancialPdfFunction
                 foreach (var product in order.Products)
                 {
                     var listItem = new ListItem(
-                        $"□ {product.Description} - {product.Qty?.ToString("0")}" + 
+                        $"□ {product.Description} - {product.Qty?.ToString("0")}" +
                         (string.IsNullOrWhiteSpace(product.Obs) ? "" : $" ({product.Obs})"));
                     listItem.SetFontSize(10);
                     list.Add(listItem);
@@ -134,11 +135,21 @@ internal class FinancialPdfFunction
             // Add the table to the document
             document.Add(table);
 
+            // Add the summary table to the document
+            if (ordersAdded.Count > 0)
+            {
+                document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                var summaryTable = CreateQuantitySalesSummary(ordersAdded.Values);
+                document.Add(new Paragraph($"Totais de produtos pedidos")
+                .SetFontSize(20)
+                .SimulateBold()
+                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)); // title sales summary
+                document.Add(summaryTable);
+            }
+
             document.Close();
 
-            File.WriteAllBytes($"C:\\Users\\tabat\\Downloads\\Pedidos - 2025-06-25.pdf", memoryStream.ToArray());
-
-            await Task.CompletedTask;
+            await File.WriteAllBytesAsync("C:\\Users\\guilh\\Downloads\\Pedidos-2025-07-07.pdf", memoryStream.ToArray());
 
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
@@ -153,5 +164,46 @@ internal class FinancialPdfFunction
                 e.Message
             });
         }
+    }
+
+    private static Table CreateQuantitySalesSummary(IEnumerable<Model.SaleHistoryViewModel> sales)
+    {
+        var productsSummary = sales
+                .SelectMany(x => x.Products)
+                .GroupBy(x => new { x.Code, x.Description })
+                .Select(g => new
+                {
+                    g.Key.Code,
+                    g.Key.Description,
+                    TotalQty = g.Sum(p => p.Qty),
+                    TotalValue = g.Sum(p => p.FinalValue),
+                })
+                .OrderBy(x => x.Description);
+
+        var summaryTable = new Table(2).UseAllAvailableWidth().SetFontSize(10)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Produto").SimulateBold()))
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()))
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+
+        // Add summary data rows
+        foreach (var product in productsSummary)
+        {
+            var cell = new Cell()
+                .SetKeepTogether(true)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+            var cell2 = new Cell()
+                .SetKeepTogether(true)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+            cell.Add(new Paragraph(product.Description));
+            cell2.Add(new Paragraph(((int?)product.TotalQty).ToString()));
+            summaryTable.AddCell(cell);
+            summaryTable.AddCell(cell2);
+        }
+
+        return summaryTable;
     }
 }
