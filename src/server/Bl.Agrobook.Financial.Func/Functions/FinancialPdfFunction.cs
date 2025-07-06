@@ -110,7 +110,7 @@ internal class FinancialPdfFunction
                 foreach (var product in order.Products)
                 {
                     var listItem = new ListItem(
-                        $"□ {product.Description} - {product.Qty?.ToString("0")}" + 
+                        $"□ {product.Description} - {product.Qty?.ToString("0")}" +
                         (string.IsNullOrWhiteSpace(product.Obs) ? "" : $" ({product.Obs})"));
                     listItem.SetFontSize(10);
                     list.Add(listItem);
@@ -135,44 +135,21 @@ internal class FinancialPdfFunction
             // Add the table to the document
             document.Add(table);
 
-            // summary
-            document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-
-            var productsSummary = ordersAdded
-                .SelectMany(x => x.Value.Products)
-                .GroupBy(x => new { x.Code, x.Description })
-                .Select(g => new
-                {
-                    g.Key.Code,
-                    g.Key.Description,
-                    TotalQty = g.Sum(p => p.Qty),
-                    TotalValue = g.Sum(p => p.FinalValue),
-                })
-                .OrderBy(x => x.Description);
-
-            var summaryTable = new Table(4).UseAllAvailableWidth();
-
-            // Add table headers
-            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Código").SimulateBold()));
-            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Descrição").SimulateBold()));
-            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()));
-            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Valor Total").SimulateBold()));
-
-            // Add summary data rows
-            foreach (var product in productsSummary)
-            {
-                summaryTable.AddCell(new Cell().Add(new Paragraph(product.Code ?? string.Empty)));
-                summaryTable.AddCell(new Cell().Add(new Paragraph(product.Description)));
-                summaryTable.AddCell(new Cell().Add(new Paragraph(product.TotalQty?.ToString("0") ?? "0")));
-                summaryTable.AddCell(new Cell().Add(new Paragraph(product.TotalValue?.ToString("C") ?? "R$ 0,00")));
-            }
-
             // Add the summary table to the document
-            if (ordersAdded.Count > 0) document.Add(summaryTable);
+            if (ordersAdded.Count > 0)
+            {
+                document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                var summaryTable = CreateQuantitySalesSummary(ordersAdded.Values);
+                document.Add(new Paragraph($"Totais de produtos pedidos")
+                .SetFontSize(20)
+                .SimulateBold()
+                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)); // title sales summary
+                document.Add(summaryTable);
+            }
 
             document.Close();
 
-            await Task.CompletedTask;
+            await File.WriteAllBytesAsync("C:\\Users\\guilh\\Downloads\\Pedidos-2025-07-07.pdf", memoryStream.ToArray());
 
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
@@ -187,5 +164,46 @@ internal class FinancialPdfFunction
                 e.Message
             });
         }
+    }
+
+    private static Table CreateQuantitySalesSummary(IEnumerable<Model.SaleHistoryViewModel> sales)
+    {
+        var productsSummary = sales
+                .SelectMany(x => x.Products)
+                .GroupBy(x => new { x.Code, x.Description })
+                .Select(g => new
+                {
+                    g.Key.Code,
+                    g.Key.Description,
+                    TotalQty = g.Sum(p => p.Qty),
+                    TotalValue = g.Sum(p => p.FinalValue),
+                })
+                .OrderBy(x => x.Description);
+
+        var summaryTable = new Table(2).UseAllAvailableWidth().SetFontSize(10)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Produto").SimulateBold()))
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()))
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+
+        // Add summary data rows
+        foreach (var product in productsSummary)
+        {
+            var cell = new Cell()
+                .SetKeepTogether(true)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+            var cell2 = new Cell()
+                .SetKeepTogether(true)
+                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+            cell.Add(new Paragraph(product.Description));
+            cell2.Add(new Paragraph(((int?)product.TotalQty).ToString()));
+            summaryTable.AddCell(cell);
+            summaryTable.AddCell(cell2);
+        }
+
+        return summaryTable;
     }
 }
