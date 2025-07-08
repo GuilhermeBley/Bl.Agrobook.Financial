@@ -149,7 +149,7 @@ internal class FinancialPdfFunction
 
             document.Close();
 
-            await File.WriteAllBytesAsync("C:\\Users\\guilh\\Downloads\\Pedidos-2025-07-07.pdf", memoryStream.ToArray());
+            await File.WriteAllBytesAsync("C:\\Users\\tabat\\Downloads\\Pedidos-2025-07-08.pdf", memoryStream.ToArray());
 
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
@@ -178,32 +178,42 @@ internal class FinancialPdfFunction
                     TotalQty = g.Sum(p => p.Qty),
                     TotalValue = g.Sum(p => p.FinalValue),
                 })
-                .OrderBy(x => x.Description);
+                .OrderBy(x => x.Description)
+                .ToArray();
 
-        var summaryTable = new Table(2).UseAllAvailableWidth().SetFontSize(10)
-                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
-
-        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Produto").SimulateBold()))
-                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
-        summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()))
-                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
-
-
-        // Add summary data rows
-        foreach (var product in productsSummary)
+        var chuncks = productsSummary.Chunk(productsSummary.Length/2+1);
+        var tableView = new Table(2).UseAllAvailableWidth();
+        foreach (var pSummaries in chuncks)
         {
-            var cell = new Cell()
-                .SetKeepTogether(true)
-                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
-            var cell2 = new Cell()
-                .SetKeepTogether(true)
-                .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
-            cell.Add(new Paragraph(product.Description));
-            cell2.Add(new Paragraph(((int?)product.TotalQty).ToString()));
-            summaryTable.AddCell(cell);
-            summaryTable.AddCell(cell2);
+            var summaryTable = new Table(2).SetFontSize(8)
+                    .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Produto").SimulateBold()))
+                    .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+            summaryTable.AddHeaderCell(new Cell().Add(new Paragraph("Quantidade").SimulateBold()))
+                    .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+
+            foreach (var product in pSummaries)
+            {
+                var cell = new Cell()
+                    .SetKeepTogether(true)
+                    .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+                var cell2 = new Cell()
+                    .SetKeepTogether(true)
+                    .SetBorder(iText.Layout.Borders.Border.NO_BORDER);
+                var description = string.Concat(product.Description?.Take(60) ?? string.Empty);
+                cell.Add(new Paragraph(description));
+                cell2.Add(new Paragraph(((int?)product.TotalQty).ToString()));
+                summaryTable.AddCell(cell);
+                summaryTable.AddCell(cell2);
+            }
+
+            var cellView = new Cell().SetKeepTogether(true);
+            cellView.Add(summaryTable);
+            tableView.AddCell(cellView);
         }
 
-        return summaryTable;
+
+        return tableView;
     }
 }
