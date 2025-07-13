@@ -149,8 +149,6 @@ internal class FinancialPdfFunction
 
             document.Close();
 
-            await File.WriteAllBytesAsync("C:\\Users\\tabat\\Downloads\\Pedidos-2025-07-08.pdf", memoryStream.ToArray());
-
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
                 FileDownloadName = $"Pedidos-{date:yyyy-MM-dd}.pdf"
