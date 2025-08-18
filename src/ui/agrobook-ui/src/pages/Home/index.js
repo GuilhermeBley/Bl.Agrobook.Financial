@@ -83,7 +83,7 @@ function Home() {
     }
 
     const addCartProduct = (product, qtt) => {
-console.log(product);console.log(qtt)
+
         if (qtt < 1) {
             return removeCartProduct(product);
         }

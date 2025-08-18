@@ -144,6 +144,7 @@ public class FinancialApiService
 
     public async IAsyncEnumerable<SaleHistoryViewModel> GetOrdersAsync(
         bool alreadyOpen = true,
+        DateTime? datebegin = null,
         [EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -155,7 +156,6 @@ public class FinancialApiService
         do
         {
             var status = new List<int>();
-            DateTime? datebegin = null;
             DateTime? dateend = null;
 
             if (alreadyOpen) status.Add(1);
