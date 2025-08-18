@@ -63,7 +63,8 @@ internal class FinancialPdfFunction
 
             if (string.IsNullOrEmpty(date)) date = $"{DateTime.Now.ToString("dd/MM/yyyy")}";
 
-            var orders = await _api.GetOrdersAsync().ToListAsync(cancellationToken);
+            var orders = await _api.GetOrdersAsync(datebegin: orderRequisition).ToListAsync(cancellationToken);
+            orders = orders.Where(x => x.Date >= orderRequisition).ToList();
 
             if (orders.Count == 0) return new NoContentResult();
 
@@ -84,7 +85,7 @@ internal class FinancialPdfFunction
             var table = new Table(2).UseAllAvailableWidth();
             Dictionary<string, Model.SaleHistoryViewModel> ordersAdded = new(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var order in orders.Where(x => x.Date >= orderRequisition).OrderBy(o => o.Products.Count))
+            foreach (var order in orders.OrderBy(o => o.Products.Count))
             {
                 if (!ordersAdded.TryAdd(order.Code, order))
                 {
@@ -148,7 +149,7 @@ internal class FinancialPdfFunction
             }
 
             document.Close();
-
+            
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
                 FileDownloadName = $"Pedidos-{date:yyyy-MM-dd}.pdf"
