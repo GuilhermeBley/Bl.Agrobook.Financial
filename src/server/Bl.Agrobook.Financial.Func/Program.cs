@@ -30,6 +30,11 @@ var host = new HostBuilder()
         {
             cfg.ConnectionString = ctx.Configuration[$"MongoDb:ConnectionString"] ?? throw new ArgumentNullException("MongoDb");
         });
+        services.Configure<KyteOptions>(cfg =>
+        {
+            cfg.Uid = ctx.Configuration[$"KyteOptions:Uid"] ?? throw new ArgumentNullException("KyteOptions");
+            cfg.Key = ctx.Configuration[$"KyteOptions:Key"] ?? throw new ArgumentNullException("KyteOptions");
+        });
 
 
         services.AddLogging()
@@ -43,6 +48,7 @@ var host = new HostBuilder()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialKyteApiService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.CsvOrderReader>()
             .AddScoped<Bl.Agrobook.Financial.Func.Services.PreOrderService>();
     })
