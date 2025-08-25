@@ -8,5 +8,5 @@ public class KyteOptions
     /// <summary>
     /// Can be found in header 'ocp-apim-subscription-key'
     /// </summary>
-    public string Key { get; set; } = string.Empty;
+    public string SubscriptionKey { get; set; } = string.Empty;
 }

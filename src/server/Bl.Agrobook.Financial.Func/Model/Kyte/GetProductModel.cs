@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Bl.Agrobook.Financial.Func.Model.Kyte;
-internal class GetProductRootModel
+public class GetProductRootModel
 {
     [JsonPropertyName("count")]
     public int Count { get; set; }
@@ -13,7 +13,7 @@ internal class GetProductRootModel
     public List<GetProductModel> Products { get; set; } = [];
 }
 
-internal class GetProductModel
+public class GetProductModel
 {
 
     [JsonPropertyName("id")]

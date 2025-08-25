@@ -33,7 +33,7 @@ var host = new HostBuilder()
         services.Configure<KyteOptions>(cfg =>
         {
             cfg.Uid = ctx.Configuration[$"KyteOptions:Uid"] ?? throw new ArgumentNullException("KyteOptions");
-            cfg.Key = ctx.Configuration[$"KyteOptions:Key"] ?? throw new ArgumentNullException("KyteOptions");
+            cfg.SubscriptionKey = ctx.Configuration[$"KyteOptions:SubscriptionKey"] ?? throw new ArgumentNullException("KyteOptions");
         });
 
 

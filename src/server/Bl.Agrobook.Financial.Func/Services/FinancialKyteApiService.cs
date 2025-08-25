@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Bl.Agrobook.Financial.Func.Services;
-internal class FinancialKyteApiService
+public class FinancialKyteApiService
 {
     private const string DefaultBaseUrlDefaultBaseUrl = "https://kyte-api-gateway.azure-api.net";
     private const string DefaultOrign = "https://web.kyteapp.com";
@@ -65,7 +65,7 @@ internal class FinancialKyteApiService
         private readonly KyteOptions _options;
         public string Uid => _options.Uid;
         public string LocalId => string.Concat(_options.Uid.Take(14));
-        public string Key => _options.Key;
+        public string Key => _options.SubscriptionKey;
 
         private KyteAuthenticationInfo(KyteOptions options)
         {
@@ -76,8 +76,8 @@ internal class FinancialKyteApiService
         {
             if (string.IsNullOrEmpty(options.Uid) || options.Uid.Length < 14)
                 throw new ArgumentNullException(nameof(options.Uid), "Uid is required");
-            if (string.IsNullOrEmpty(options.Key))
-                throw new ArgumentNullException(nameof(options.Key), "Key is required");
+            if (string.IsNullOrEmpty(options.SubscriptionKey))
+                throw new ArgumentNullException(nameof(options.SubscriptionKey), "Key is required");
             return new KyteAuthenticationInfo(options);
         }
     }
