@@ -11,7 +11,7 @@ function Order() {
         progressCount: 0,
         fileUploading: false,
         isDowloadingPdf: false,
-        currentPdfDate: undefined,
+        currentPdfDate: new Date(),
         alertMessage: { success: true, message: '', timeout: undefined },
         preOrders: [],
     })
@@ -115,8 +115,10 @@ function Order() {
 
             if (pdfResult.Status == Status.NoData) {
                 setPageData(p => ({
+                    ...p,
                     alertMessage: { success: true, message: "Nenhum pedido em aberto.", timeout: 5000 }
                 }))
+                return;
             }
 
             if (!(pdfResult.Data instanceof Blob)) {
@@ -207,8 +209,8 @@ function Order() {
                     </form>
 
                     <div className="mt-3">
-                        <label for="ordersDateInput">Data pedido</label>
-                        <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." onChange={handleOrderDateChange}/>
+                        <label for="ordersDateInput">Data entrada dos pedidos</label>
+                        <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." value={pageData.currentPdfDate.toISOString().split('T')[0]} onChange={handleOrderDateChange}/>
                         <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
                             <span id="submitText">Fazer download do PDF</span>
                             <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
