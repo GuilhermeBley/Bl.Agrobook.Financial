@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Bl.Agrobook.Financial.Func.Services;
 public class FinancialKyteApiService
@@ -34,24 +35,66 @@ public class FinancialKyteApiService
         _httpClient.DefaultRequestHeaders.Add("accept", "application/json, text/plain, */*");
         _options = options;
     }
+
     public async IAsyncEnumerable<GetProductModel> GetProductsAsync([EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
         var auth = KyteAuthenticationInfo.Create(_options.Value);
+        var skip = 0;
+        const int limit = 80;
+        var hasMore = true;
 
-        // TODO: add pagination
-        var request = new HttpRequestMessage(
-            HttpMethod.Get, 
-            $"api/kyte-web/products/{auth.LocalId}?limit=80&stockStatus=&categoryId=&sort=PIN_FIRST&skip=0&search=&isWeb=1");
-        AddAuthorizationHeaders(request, auth);
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        do
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"api/kyte-web/products/{auth.LocalId}?limit={limit}&stockStatus=&categoryId=&sort=PIN_FIRST&skip={skip}&search=&isWeb=1");
+            AddAuthorizationHeaders(request, auth);
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<GetProductRootModel> (_jsonOptions, cancellationToken);
+            var result = await response.Content.ReadFromJsonAsync<GetProductRootModel>(_jsonOptions, cancellationToken);
 
-        if (result?.Products == null) yield break;
+            if (result?.Products == null) yield break;
 
-        foreach (var content in result.Products)
-            yield return content;
+            foreach (var content in result.Products)
+                yield return content;
+
+            hasMore = result.Products.Count == limit;
+        } while (hasMore);
+    }
+
+    public async IAsyncEnumerable<GetCustomerCustomerModel> GetCustomersAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var auth = KyteAuthenticationInfo.Create(_options.Value);
+        var skip = 0;
+        const int limit = 80;
+        var hasMore = true;
+
+        do
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"api/kyte-web/products/{auth.LocalId}?limit={limit}&stockStatus=&categoryId=&sort=PIN_FIRST&skip={skip}&search=&isWeb=1");
+            AddAuthorizationHeaders(request, auth);
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<GetCustomerModel>(_jsonOptions, cancellationToken);
+
+            if (result?.Customers == null) yield break;
+
+            foreach (var content in result.Customers)
+                yield return content;
+
+            hasMore = result.Customers.Count == limit;
+        } while (hasMore);
+    }
+
+    public async Task<JsonNode> CreateOrderAsync(
+        GetCustomerCustomerModel customer,
+        CreateCartProductModel[] products)
+    {
+
     }
 
     private void AddAuthorizationHeaders(HttpRequestMessage request, KyteAuthenticationInfo auth)
