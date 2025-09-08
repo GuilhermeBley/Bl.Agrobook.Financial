@@ -68,31 +68,31 @@ public class GetProductModel
     public object? Category { get; set; }
 
     [JsonPropertyName("isFractioned")]
-    public bool IsFractioned { get; set; }
+    public bool? IsFractioned { get; set; }
 
     [JsonPropertyName("saleCostPrice")]
-    public int SaleCostPrice { get; set; }
+    public int? SaleCostPrice { get; set; }
 
     [JsonPropertyName("salePrice")]
-    public int SalePrice { get; set; }
+    public int? SalePrice { get; set; }
 
     [JsonPropertyName("userName")]
     public string? UserName { get; set; }
 
     [JsonPropertyName("showOnCatalog")]
-    public bool ShowOnCatalog { get; set; }
+    public bool? ShowOnCatalog { get; set; }
 
     [JsonPropertyName("stock")]
     public object? Stock { get; set; }
 
     [JsonPropertyName("pin")]
-    public bool Pin { get; set; }
+    public bool? Pin { get; set; }
 
     [JsonPropertyName("salePromotionalPrice")]
     public object? SalePromotionalPrice { get; set; }
 
     [JsonPropertyName("stockActive")]
-    public bool StockActive { get; set; }
+    public bool? StockActive { get; set; }
 
     [JsonPropertyName("stockStatus")]
     public string? StockStatus { get; set; }
@@ -110,7 +110,7 @@ public class GetProductModel
     public object? IsChildren { get; set; }
 
     [JsonPropertyName("isParent")]
-    public bool IsParent { get; set; }
+    public bool? IsParent { get; set; }
 
     [JsonPropertyName("parentId")]
     public object? ParentId { get; set; }

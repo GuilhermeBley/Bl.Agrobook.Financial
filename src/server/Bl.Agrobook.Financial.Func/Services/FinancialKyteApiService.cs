@@ -60,6 +60,7 @@ public class FinancialKyteApiService
                 yield return content;
 
             hasMore = result.Products.Count == limit;
+            skip += limit;
         } while (hasMore);
     }
 
@@ -87,6 +88,7 @@ public class FinancialKyteApiService
                 yield return content;
 
             hasMore = result.Customers.Count == limit;
+            skip += limit;
         } while (hasMore);
     }
 
