@@ -1,10 +1,10 @@
-using Bl.Agrobook.Financial.Func.Model;
 using Bl.Agrobook.Financial.Func.Model.Kyte;
 using Bl.Agrobook.Financial.Func.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Bl.Agrobook.Financial.Func.Functions;
@@ -75,9 +75,9 @@ public class FinancialOrderFunctionV2
 
             // var currentOpenedOrders = // TODO: Check the current orders to avoid duplication
 
-            var createModels = MapOrdersByInfo(creationModels, products, customers);
+            var createModels = MapOrdersByInfo(creationModels, products.ToArray(), customers.ToArray());
 
-            var creationResult = new List<CreationOrderResultCsvModel>();
+            var creationResult = new List<Model.CreationOrderResultCsvModel>();
 
             foreach (var createModel in createModels)
             {
@@ -139,7 +139,7 @@ public class FinancialOrderFunctionV2
         }
     }
 
-    private async Task<CreateOrderCsvModel[]> CheckFileAsync(
+    private async Task<Model.CreateOrderCsvModel[]> CheckFileAsync(
         CultureInfo cultureInfo,
         IFormFile formFile,
         CancellationToken cancellationToken = default)
@@ -151,13 +151,63 @@ public class FinancialOrderFunctionV2
     }
 
     private IEnumerable<(GetCustomerCustomerModel Customer, CreateCartProductModel[] Products)> MapOrdersByInfo(
-        CreateOrderCsvModel[] models,
-        GetProductsViewModel[] products,
+        Model.CreateOrderCsvModel[] models,
+        GetProductViewModel[] products,
         GetCustomerCustomerModel[] customers)
     {
-        foreach (var model in models)
+        CreateCartProductModel MapToCart(Model.CreateOrderCsvModel order, GetProductViewModel[] products)
         {
+            try
+            {
+                var productFound = products
+                    .Single(x => IntNumberEqualityComparer.Default.Equals(x.Code, order.ProductCode));
+                return new CreateCartProductModel
+                {
+                    Amount = order.Quantity,
+                    ProductId = productFound.Id,
+                    UnitValue = order.Price,
+                };
+            }
+            catch
+            {
+                throw new ArgumentException($"Falha ao coletar produto com código {order.ProductCode}.");
+            }
+        }
 
+        var orders = models
+            .GroupBy(x => x.CustomerCode)
+            .ToDictionary(x => x.Key, x => x.ToArray())
+            .ToArray();
+
+        foreach (var order in orders)
+        {
+            var customerCode = order.Value.First().CustomerCode;
+            yield return (
+                customers.SingleOrDefault(x => IntNumberEqualityComparer.Default
+                    .Equals(customerCode, x.DocumentNumber))
+                ?? throw new ArgumentException($"Cliente com código {customerCode} não foi encontrado."),
+                order.Value.Select(x => MapToCart(x, products)).ToArray()
+            );
+        }
+    }
+
+    private class IntNumberEqualityComparer : IEqualityComparer<string?>
+    {
+        public static readonly IntNumberEqualityComparer Default = new();
+
+        public bool Equals(string? x, string? y)
+        {
+            if (x == null || y == null) return false;
+
+            return int.TryParse(x, out int nx) &&
+                int.TryParse(y, out var ny) &&
+                nx == ny;
+        }
+
+        public int GetHashCode([DisallowNull] string obj)
+        {
+            if (int.TryParse(obj, out var n)) return n;
+            return obj.GetHashCode();
         }
     }
 }

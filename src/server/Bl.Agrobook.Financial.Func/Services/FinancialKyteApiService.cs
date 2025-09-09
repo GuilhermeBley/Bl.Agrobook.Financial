@@ -36,7 +36,7 @@ public class FinancialKyteApiService
         _options = options;
     }
 
-    public async IAsyncEnumerable<GetProductModel> GetProductsAsync([EnumeratorCancellation]CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<GetProductViewModel> GetProductsAsync([EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
         var auth = KyteAuthenticationInfo.Create(_options.Value);
         var skip = 0;
