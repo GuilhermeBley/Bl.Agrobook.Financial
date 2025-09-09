@@ -75,7 +75,8 @@ public class FinancialOrderFunctionV2
 
             // var currentOpenedOrders = // TODO: Check the current orders to avoid duplication
 
-            var createModels = MapOrdersByInfo(creationModels, products.ToArray(), customers.ToArray());
+            var createModels = MapOrdersByInfo(creationModels, products.ToArray(), customers.ToArray())
+                .ToArray();
 
             var creationResult = new List<Model.CreationOrderResultCsvModel>();
 
