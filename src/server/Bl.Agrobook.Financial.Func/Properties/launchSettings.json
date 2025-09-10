@@ -2,7 +2,7 @@
   "profiles": {
     "Bl.Agrobook.Financial.Func": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7082 --functions GetAllProductsFunctionV2"
+      "commandLineArgs": "--port 7082 --functions GeneratePdfV2"
     }
   }
 }

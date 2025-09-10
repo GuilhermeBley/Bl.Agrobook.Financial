@@ -36,6 +36,38 @@ public class FinancialKyteApiService
         _options = options;
     }
 
+    public async IAsyncEnumerable<GetSaleModel> GetPendingSalesAsync(
+        DateTime? startDate,
+        [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    {
+        var auth = KyteAuthenticationInfo.Create(_options.Value);
+        var skip = 0;
+        const int limit = 80;
+        var hasMore = true;
+
+        do
+        {
+            // k7gRNr5CI3gtgj
+            // k7gRNr5CI3gtgj
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"api/kyte-web/sale?aid={auth.LocalId}&limit={limit}&startDate={startDate?.ToString("yyyyMMdd")}&sort=DESC_DATE_CREATION&status=opened&uid=&payment=&getStats=1&timezone=-03:00");
+            AddAuthorizationHeaders(request, auth);
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<GetSalesModel>(_jsonOptions, cancellationToken);
+
+            if (result?.Sales == null) yield break;
+
+            foreach (var content in result.Sales)
+                yield return content;
+
+            hasMore = result.Sales.Count == limit;
+            skip += limit;
+        } while (hasMore);
+    }
+
     public async IAsyncEnumerable<GetProductModel> GetProductsAsync([EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
         var auth = KyteAuthenticationInfo.Create(_options.Value);
