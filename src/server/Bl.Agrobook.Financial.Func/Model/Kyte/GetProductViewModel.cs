@@ -10,10 +10,10 @@ public class GetProductRootModel
     public string? IsWeb { get; set; }
 
     [JsonPropertyName("_products")]
-    public List<GetProductModel> Products { get; set; } = [];
+    public List<GetProductViewModel> Products { get; set; } = [];
 }
 
-public class GetProductModel
+public class GetProductViewModel
 {
 
     [JsonPropertyName("id")]

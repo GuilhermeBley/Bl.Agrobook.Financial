@@ -177,13 +177,6 @@ public class FinancialKyteApiService
             prodCount++;
         }
 
-        using var cartReq = new HttpRequestMessage(HttpMethod.Post, $"api/kyte-web/cart");
-        AddAuthorizationHeaders(cartReq, auth);
-        using var cartResp = await _httpClient.SendAsync(cartReq, cancellationToken);
-        cartResp.EnsureSuccessStatusCode();
-        var cartDetails = await cartResp.Content.ReadFromJsonAsync<JsonNode>()
-            ?? throw new HttpRequestException("Falha em coleta de carrinho.");
-
         // Finishing cart to complete the order, completing as order and not as sell
         var finishingOrderObj = new FinishSaleRequestModel()
         {
@@ -200,6 +193,8 @@ public class FinancialKyteApiService
         AddAuthorizationHeaders(finishingCartReq, auth);
         using var finishingCartResp = await _httpClient.SendAsync(finishingCartReq, cancellationToken);
         finishingCartResp.EnsureSuccessStatusCode();
+        var cartDetails = await finishingCartResp.Content.ReadFromJsonAsync<JsonNode>()
+            ?? throw new HttpRequestException("Falha em coleta de carrinho.");
 
         return cartDetails;
     }

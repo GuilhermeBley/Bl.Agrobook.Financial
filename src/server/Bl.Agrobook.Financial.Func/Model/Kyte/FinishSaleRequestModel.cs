@@ -21,10 +21,10 @@ internal class FinishSaleRequestModel
     public bool ShowObservationInReceipt { get; set; } = false;
 
     [JsonPropertyName("date")]
-    public DateTime Date { get; set; } // TODO: Check field before submitting the cart
+    public DateTime Date { get; set; } = DateTime.UtcNow;
 
     [JsonPropertyName("dateInt")]
-    public int DateInt { get; set; } // TODO: Check field before submitting the cart
+    public int DateInt { get; set; } = int.Parse(DateTime.UtcNow.ToString("yyyyMMdd"));
 
     [JsonPropertyName("dateLocal")]
     public DateTime DateLocal { get; set; } = DateTime.UtcNow;
