@@ -84,7 +84,10 @@ internal class FinancialPdfFunctionV2
             var table = new Table(2).UseAllAvailableWidth();
             Dictionary<string, Model.Kyte.GetSaleModel> ordersAdded = new(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var order in orders.OrderBy(o => o.Items.Count))
+            foreach (var order in orders
+                .Where(o => o.Active is true)
+                .Where(o => o.IsCancelled is false)
+                .OrderBy(o => o.Items.Count))
             {
                 var code = order.Number.ToString();
                 if (!ordersAdded.TryAdd(code, order))
