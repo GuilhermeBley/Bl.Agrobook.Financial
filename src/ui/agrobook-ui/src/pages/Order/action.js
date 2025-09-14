@@ -47,21 +47,23 @@ export const postFileAsync = async (file, uploadProgress = (progressEvent) => { 
 
 export const generatePdf = async (orderDate) => {
     try {
+        let formatedOrderDate = ""
         if (orderDate instanceof Date) {
             let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
             let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
             let year = orderDate.getFullYear(); // yyyy
-            orderDate = `${day}/${month}/${year}`;
+            formatedOrderDate = `${day}/${month}/${year}`;
         }
         else {
-            orderDate = undefined
+            formatedOrderDate = undefined
         }
 
+        let creationDate = subtractDays(orderDate, 1)
         const response = await api.post(
             'api/financial/order/pdf',
             {
-                orderDate: orderDate,
-                orderCreatedAt: "2025-06-08"
+                orderDate: formatedOrderDate,
+                orderCreatedAt: creationDate.toISOString().split('T')[0]
             },
             {
                 headers: {
@@ -136,6 +138,12 @@ export const getPreOrders = async () => {
             Result: "Falha ao coletar dados dos produtos."
         }
     }
+}
+
+function subtractDays(date = new Date(), days = 1) {
+  const result = new Date(date);
+  result.setDate(result.getDate() - days);
+  return result;
 }
 
 export const Status = {
