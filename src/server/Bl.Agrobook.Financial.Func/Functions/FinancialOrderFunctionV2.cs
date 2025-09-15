@@ -89,6 +89,7 @@ public class FinancialOrderFunctionV2
                 var keyId = (createModel.Customer.Uid, DateOnly.FromDateTime(DateTime.Now));
                 try
                 {
+                    // Get last opened orders
                     // if (activeOrders.ContainsKey(keyId)) ;// TODO: Check the current orders before posting a new one
 
                     var result = await _financialApiService.CreateOrderAsync(
