@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageNavigationBar from "../../components/PageNavigationBar";
-import { postFileAsync, Status, generatePdf, getPreOrders } from "./action"
+import { postFileAsync, Status, generatePdf, getPreOrders, generatePdfV2 } from "./action"
 import SingleAlertComponent from "../../components/SingleAlertComponent"
 import PreOrderTable from "./PreOrderTableComponenet";
 
@@ -103,7 +103,7 @@ function Order() {
         }
     };
 
-    const handlePdfGeneration = async () => {
+    const handlePdfGeneration = async (version) => {
         try {
 
             setPageData(p => ({
@@ -111,7 +111,15 @@ function Order() {
                 isDowloadingPdf: true
             }))
 
-            let pdfResult = await generatePdf(pageData.currentPdfDate)
+            let pdfResult = undefined;
+            if (version == "v2")
+            {
+                pdfResult = await generatePdfV2(pageData.currentPdfDate)
+            }
+            else
+            {
+                pdfResult = await generatePdf(pageData.currentPdfDate)
+            }
 
             if (pdfResult.Status == Status.NoData) {
                 setPageData(p => ({
@@ -213,6 +221,10 @@ function Order() {
                         <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." value={pageData.currentPdfDate.toISOString().split('T')[0]} onChange={handleOrderDateChange}/>
                         <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
                             <span id="submitText">Fazer download do PDF</span>
+                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" onClick={(() => handlePdfGeneration("v2"))} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
+                            <span id="submitText">Fazer download do PDF V2</span>
                             <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         </button>
                     </div>
