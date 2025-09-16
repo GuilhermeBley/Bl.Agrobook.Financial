@@ -219,14 +219,18 @@ function Order() {
                     <div className="mt-3">
                         <label for="ordersDateInput">Data entrada dos pedidos</label>
                         <input id="ordersDateInput" type="date" class="form-control" placeholder="Selecione a data que os pedidos serão entregues." value={pageData.currentPdfDate.toISOString().split('T')[0]} onChange={handleOrderDateChange}/>
-                        <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
-                            <span id="submitText">Fazer download do PDF</span>
-                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" onClick={(() => handlePdfGeneration("v2"))} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
-                            <span id="submitText">Fazer download do PDF V2</span>
-                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        </button>
+                        
+                        
+                        <div class="btn-group" role="group" aria-label="Selecione a versao">
+                            <button type="button" onClick={handlePdfGeneration} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
+                                <span id="submitText">Fazer download do PDF</span>
+                                <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" onClick={(() => handlePdfGeneration("v2"))} disabled={pageData.isDowloadingPdf} class="btn btn-secondary btn-lg mt-1">
+                                <span id="submitText">Fazer download do PDF V2</span>
+                                <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                        </div>
                     </div>
 
                     <PreOrderTable data={pageData.preOrders} />
