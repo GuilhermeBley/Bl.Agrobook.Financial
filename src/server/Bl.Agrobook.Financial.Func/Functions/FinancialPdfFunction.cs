@@ -104,7 +104,7 @@ internal class FinancialPdfFunction
                 .Select(x => new SaleHistoryViewModel
                 {
                     Canceled = false,
-                    Code = $"({orderRequisition.ToString("yyyy-MM-dd")}-{createModels.IndexOf(x)})",
+                    Code = $"{orderRequisition.ToString("yyyy-MM-dd")}-{createModels.IndexOf(x)}",
                     FinalValue = x.FinalValue,
                     Products = x.Products.Select(p => new SaleProduct
                     {
