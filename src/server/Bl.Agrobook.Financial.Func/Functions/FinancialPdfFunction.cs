@@ -55,15 +55,8 @@ internal class FinancialPdfFunction
         {
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
-            JsonNode? data = null;
-            try
-            {
-                data = System.Text.Json.JsonSerializer.Deserialize<JsonNode>(requestBody);
-            }
-            catch { }
-
-            var date = data?["orderDate"]?.ToString();
-            var orderRequisitionDate = data?["orderCreatedAt"]?.ToString();
+            var date = req.Query["orderDate"];
+            var orderRequisitionDate = req.Query["orderCreatedAt"];
 
             if (!DateTime.TryParseExact(orderRequisitionDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var orderRequisition))
             {
@@ -98,21 +91,24 @@ internal class FinancialPdfFunction
 
             _logger.LogInformation("Customers: {customers}", customers.Count);
 
-            var createModels = _salesService.MapOrdersByFormFileAsync(cultureInfo, ordersToCreate, products, customers, cancellationToken);
+            var createModels = _salesService
+                .MapOrdersByFormFileAsync(cultureInfo, ordersToCreate, products, customers, cancellationToken)
+                .ToList();
 
             using var memoryStream = new MemoryStream();
 
             GenerateByOrdersAsync(
                 memoryStream, 
                 date,
-                createModels.Select(x => new SaleHistoryViewModel
+                createModels
+                .Select(x => new SaleHistoryViewModel
                 {
                     Canceled = false,
-                    Code = "XXX",
+                    Code = $"({orderRequisition.ToString("yyyy-MM-dd")}-{createModels.IndexOf(x)})",
                     FinalValue = x.FinalValue,
                     Products = x.Products.Select(p => new SaleProduct
                     {
-                        Code = p.Code,
+                        Code = p.Code ?? string.Empty,
                         Description = p.Description,
                         Qty = p.Qty,
                         FinalValue = p.FinalValue,
