@@ -41,6 +41,8 @@ var host = new HostBuilder()
             .AddMemoryCache()
             .AddHttpClient()
 
+            .AddScoped<Bl.Agrobook.Financial.Func.Services.SalesService>()
+
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.ProductRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.PreOrderRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.DeliveryDateRepository>()

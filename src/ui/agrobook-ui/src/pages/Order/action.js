@@ -104,6 +104,65 @@ export const generatePdf = async (orderDate) => {
     }
 }
 
+export const generatePdfV2 = async (orderDate) => {
+    try {
+        let formatedOrderDate = ""
+        if (orderDate instanceof Date) {
+            let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
+            let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
+            let year = orderDate.getFullYear(); // yyyy
+            formatedOrderDate = `${day}/${month}/${year}`;
+        }
+        else {
+            formatedOrderDate = undefined
+        }
+
+        let creationDate = subtractDays(orderDate, 1)
+        const response = await api.post(
+            'api/v2/financial/order/pdf',
+            {
+                orderDate: formatedOrderDate,
+                orderCreatedAt: creationDate.toISOString().split('T')[0]
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                responseType: 'blob'
+            });
+
+        if (response.status === 401) {
+            return {
+                Status: Status.Unauthorized,
+                Data: undefined
+            };
+        }
+
+        if (response.status === 204) {
+            return {
+                Status: Status.NoData,
+                Data: undefined
+            }
+        }
+
+        if (response.status === 200) {
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            return {
+                Status: Status.Ok,
+                Data: blob
+            };
+        }
+
+        throw new Error('Unexpected response type: ' + response.headers.contentType);
+    } catch (err) {
+        console.error('Failed to generate PDF.', err)
+        return {
+            Status: Status.Failed,
+            Data: "Falha ao processar."
+        };
+    }
+}
+
 export const getPreOrders = async () => {
     let response = await api.get('api/financial/preorder')
 
