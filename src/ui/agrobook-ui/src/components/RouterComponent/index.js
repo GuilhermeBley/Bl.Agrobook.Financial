@@ -3,7 +3,7 @@ import Home from '../../pages/Home';
 import Order from '../../pages/Order';
 
 
-function Pages() {
+function RouterComponent() {
     return (
         <Routes>
             <Route path="/" exact element={<Home />} />
@@ -13,4 +13,4 @@ function Pages() {
     )
 }
 
-export default Pages;
+export default RouterComponent;
