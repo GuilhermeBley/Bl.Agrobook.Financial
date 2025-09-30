@@ -30,11 +30,18 @@ var host = new HostBuilder()
         {
             cfg.ConnectionString = ctx.Configuration[$"MongoDb:ConnectionString"] ?? throw new ArgumentNullException("MongoDb");
         });
+        services.Configure<KyteOptions>(cfg =>
+        {
+            cfg.Uid = ctx.Configuration[$"KyteOptions:Uid"] ?? throw new ArgumentNullException("KyteOptions");
+            cfg.SubscriptionKey = ctx.Configuration[$"KyteOptions:SubscriptionKey"] ?? throw new ArgumentNullException("KyteOptions");
+        });
 
 
         services.AddLogging()
             .AddMemoryCache()
             .AddHttpClient()
+
+            .AddScoped<Bl.Agrobook.Financial.Func.Services.SalesService>()
 
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.ProductRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Repositories.PreOrderRepository>()
@@ -43,6 +50,7 @@ var host = new HostBuilder()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AuthService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.AgrobookAuthRepository>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialApiService>()
+            .AddSingleton<Bl.Agrobook.Financial.Func.Services.FinancialKyteApiService>()
             .AddSingleton<Bl.Agrobook.Financial.Func.Services.CsvOrderReader>()
             .AddScoped<Bl.Agrobook.Financial.Func.Services.PreOrderService>();
     })
