@@ -104,7 +104,7 @@ internal class FinancialPdfFunction
                 .Select(x => new SaleHistoryViewModel
                 {
                     Canceled = false,
-                    Code = $"{orderRequisition.ToString("yyyy-MM-dd")}-{createModels.IndexOf(x)}",
+                    Code = $"G-{orderRequisition.ToString("yyyyMMdd")}{createModels.IndexOf(x)}",
                     FinalValue = x.FinalValue,
                     Products = x.Products.Select(p => new SaleProduct
                     {
@@ -119,8 +119,11 @@ internal class FinancialPdfFunction
                         Name = x.Customer.Name,
                         Uid = x.Customer.Uid
                     },
+                    Obs = x.Obs,
                 }).ToArray());
-            
+
+            File.WriteAllBytes("C:\\Users\\guilh\\Downloads\\Pedidos-2025-10-08.pdf", memoryStream.ToArray());
+
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
                 FileDownloadName = $"Pedidos-{date:yyyy-MM-dd}.pdf"
