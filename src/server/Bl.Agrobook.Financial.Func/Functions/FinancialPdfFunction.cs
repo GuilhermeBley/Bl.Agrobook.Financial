@@ -113,8 +113,6 @@ internal class FinancialPdfFunction
                     Obs = x.Obs,
                 }).ToArray());
 
-            File.WriteAllBytes("C:\\Users\\guilh\\Downloads\\Pedidos-2025-10-13.pdf", memoryStream.ToArray());
-
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
                 FileDownloadName = $"Pedidos-{date:yyyy-MM-dd}.pdf"
