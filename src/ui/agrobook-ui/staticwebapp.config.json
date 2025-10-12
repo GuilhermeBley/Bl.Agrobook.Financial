@@ -1,10 +1,22 @@
 {
-    "navigationFallback": {
-        "rewrite": "index.html",
-        "exclude": [
-            "*.{svg,png,jpg,gif}",
-            "*.{css,scss}",
-            "*.js"
-        ]
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*", "/css/*", "/js/*", "/static/*"]
+  },
+  "routes": [
+    {
+      "route": "/*",
+      "serve": "/index.html",
+      "statusCode": 200
     }
+  ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  },
+  "mimeTypes": {
+    ".json": "text/json"
+  }
 }

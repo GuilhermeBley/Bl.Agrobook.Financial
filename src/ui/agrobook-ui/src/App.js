@@ -1,4 +1,4 @@
-import Pages from './components/Pages';
+import Pages from './components/RouterComponent';
 import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 
