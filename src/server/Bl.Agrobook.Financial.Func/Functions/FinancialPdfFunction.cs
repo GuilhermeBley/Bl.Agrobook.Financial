@@ -56,15 +56,6 @@ internal class FinancialPdfFunction
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
             var date = req.Query["orderDate"];
-            var orderRequisitionDate = req.Query["orderCreatedAt"];
-
-            if (!DateTime.TryParseExact(orderRequisitionDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var orderRequisition))
-            {
-                return new BadRequestObjectResult(new
-                {
-                    Message = "Adicione a data 'orderCreatedAt' no corpo da requisição."
-                });
-            }
             var cultureInfoQuery = req.Query["cultureInfo"].ToString();
 
             if (string.IsNullOrWhiteSpace(cultureInfoQuery)) cultureInfoQuery = "pt-BR";
@@ -104,7 +95,7 @@ internal class FinancialPdfFunction
                 .Select(x => new SaleHistoryViewModel
                 {
                     Canceled = false,
-                    Code = $"G-{orderRequisition.ToString("yyyyMMdd")}{createModels.IndexOf(x)}",
+                    Code = $"G-{DateTime.UtcNow.ToString("yyyyMMdd")}{createModels.IndexOf(x)}",
                     FinalValue = x.FinalValue,
                     Products = x.Products.Select(p => new SaleProduct
                     {
@@ -122,7 +113,7 @@ internal class FinancialPdfFunction
                     Obs = x.Obs,
                 }).ToArray());
 
-            File.WriteAllBytes("C:\\Users\\guilh\\Downloads\\Pedidos-2025-10-08.pdf", memoryStream.ToArray());
+            File.WriteAllBytes("C:\\Users\\guilh\\Downloads\\Pedidos-2025-10-13.pdf", memoryStream.ToArray());
 
             return new FileContentResult(memoryStream.ToArray(), "application/pdf")
             {
