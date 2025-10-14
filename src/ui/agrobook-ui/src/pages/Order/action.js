@@ -107,22 +107,21 @@ export const generatePdf = async (orderDate) => {
 export const generatePdfByFile = async (orderDate, file, uploadProgress = (progressEvent) => { }) => {
     try {
         let formatedOrderDate = ""
-        if (orderDate instanceof Date) {
-            let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
-            let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
-            let year = orderDate.getFullYear(); // yyyy
-            formatedOrderDate = `${day}/${month}/${year}`;
-        }
-        else {
-            formatedOrderDate = undefined
-        }
-
-        let creationDate = subtractDays(orderDate, 1)
+        let pdfFileName = ""
+        
+        if (orderDate instanceof Date === false)
+            orderDate = Date();
+        
+        let day = String(orderDate.getDate() + 1).padStart(2, '0'); // dd
+        let month = String(orderDate.getMonth() + 1).padStart(2, '0'); // MM (months are 0-indexed)
+        let year = orderDate.getFullYear(); // yyyy
+        formatedOrderDate = `${day}/${month}/${year}`;
+        pdfFileName = `${year}-${month}-${day}`;
 
         const formData = new FormData();
         formData.append('file', file);
         const response = await api.post(
-            'api/financial/order/pdf/by-file?orderDate=2025-09-28&orderCreatedAt=2025-09-29&cultureInfo=en-us',
+            `api/financial/order/pdf/by-file?orderDate=${pdfFileName}&cultureInfo=en-us`,
             formData,
             {
                 headers: {
