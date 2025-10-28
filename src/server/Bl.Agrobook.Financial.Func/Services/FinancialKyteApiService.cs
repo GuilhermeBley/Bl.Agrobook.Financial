@@ -47,8 +47,6 @@ public class FinancialKyteApiService
 
         do
         {
-            // k7gRNr5CI3gtgj
-            // k7gRNr5CI3gtgj
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
                 $"api/kyte-web/sale?aid={auth.LocalId}&limit={limit}&startDate={startDate?.ToString("yyyyMMdd")}&sort=DESC_DATE_CREATION&status=opened&uid=&payment=&getStats=1&timezone=-03:00");
