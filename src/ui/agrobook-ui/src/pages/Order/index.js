@@ -27,7 +27,7 @@ function Order() {
                     alertMessage: { ...p.alertMessage, show: false }
                 }));
             }, pageData.alertMessage.timeout);
-            
+
             return () => clearTimeout(timer);
         }
     }, [pageData.alertMessage.timeout, pageData.alertMessage.show]);
@@ -66,12 +66,31 @@ function Order() {
             showAlert(false, "Por favor, selecione um arquivo CSV.");
             return;
         }
-        
+
         setPageData(p => ({
             ...p,
             fileToUpload: file
         }));
     };
+
+    function checkFirstRowForComma(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const content = e.target.result;
+                const firstLine = content.split('\n')[0];
+                const hasComma = firstLine.includes(',');
+                resolve(hasComma);
+            };
+
+            reader.onerror = function () {
+                reject(new Error('Failed to read file'));
+            };
+
+            reader.readAsText(file);
+        });
+    }
 
     const handleUpload = async () => {
         if (!pageData.fileToUpload) {
@@ -86,6 +105,10 @@ function Order() {
         }));
 
         try {
+            let filePreferences = (await checkFirstRowForComma(pageData.fileToUpload))
+                ? 'en-US'
+                : 'pt-BR';
+                
             let result = await postFileAsync(
                 pageData.fileToUpload,
                 (progressEvent) => {
@@ -96,13 +119,14 @@ function Order() {
                         ...p,
                         progressCount: progress,
                     }));
-                }
+                },
+                filePreferences
             );
-
+            
             if (result.Status === Status.Ok) {
                 let newOrdersCount = Array.isArray(result.Data) ? result.Data.length : 0;
                 showAlert(true, `Completo com sucesso. ${newOrdersCount} novos pedidos feitos.`);
-                
+
                 // Refresh pre-orders list
                 const preOrders = await getPreOrders();
                 if (preOrders.Status === Status.Ok) {
@@ -111,17 +135,17 @@ function Order() {
                         preOrders: preOrders.Result
                     }));
                 }
-                
+
                 // Clear file input
                 setPageData(p => ({
                     ...p,
                     fileToUpload: undefined
                 }));
-                
+
                 // Reset file input
                 const fileInput = document.querySelector('input[type="file"]');
                 if (fileInput) fileInput.value = '';
-                
+
                 return;
             }
 
@@ -146,7 +170,7 @@ function Order() {
                 isDownloadingPdf: true
             }));
 
-            let pdfResult = version === "v2" 
+            let pdfResult = version === "v2"
                 ? await generatePdfV2(pageData.currentPdfDate)
                 : await generatePdf(pageData.currentPdfDate);
 
@@ -160,13 +184,13 @@ function Order() {
                 return;
             }
 
-            const dateString = pageData.currentPdfDate instanceof Date 
+            const dateString = pageData.currentPdfDate instanceof Date
                 ? pageData.currentPdfDate.toISOString().split('T')[0]
                 : 'pedidos';
-            
+
             const versionSuffix = version === "v2" ? "-v2" : "";
             downloadBlob(pdfResult.Data, `Pedidos-${dateString}${versionSuffix}.pdf`);
-            
+
             showAlert(true, "PDF gerado com sucesso!");
 
         } catch (error) {
@@ -199,12 +223,12 @@ function Order() {
                 return;
             }
 
-            const dateString = pageData.currentPdfDate instanceof Date 
+            const dateString = pageData.currentPdfDate instanceof Date
                 ? pageData.currentPdfDate.toISOString().split('T')[0]
                 : 'pedidos';
-            
+
             downloadBlob(pdfResult.Data, `Pedidos-${dateString}.pdf`);
-            
+
             showAlert(true, "PDF gerado com sucesso!");
 
         } catch (error) {
@@ -237,7 +261,7 @@ function Order() {
     const handleOrderDateChange = (e) => {
         const value = e.target.value;
         const date = new Date(value);
-        
+
         setPageData(p => ({
             ...p,
             currentPdfDate: date
@@ -258,7 +282,7 @@ function Order() {
             showAlert(false, "Por favor, selecione um arquivo CSV.");
             return;
         }
-        
+
         console.log("File set")
         setPageData(p => ({
             ...p,
@@ -277,7 +301,7 @@ function Order() {
                 <SingleAlertComponent
                     message={pageData.alertMessage.message}
                     kind={pageData.alertMessage.success ? 'success' : 'danger'}
-                    timeout={pageData.alertMessage.timeout} 
+                    timeout={pageData.alertMessage.timeout}
                 />
             )}
 
@@ -304,17 +328,17 @@ function Order() {
                                 accept=".csv"
                                 required
                                 onChange={handleFileChange}
-                                disabled={pageData.fileUploading} 
+                                disabled={pageData.fileUploading}
                             />
                         </div>
-                        
+
                         {/* Progress Bar */}
                         {pageData.fileUploading && (
                             <div className="mb-3">
                                 <div className="progress">
-                                    <div 
-                                        className="progress-bar" 
-                                        role="progressbar" 
+                                    <div
+                                        className="progress-bar"
+                                        role="progressbar"
                                         style={{ width: `${pageData.progressCount}%` }}
                                         aria-valuenow={pageData.progressCount}
                                         aria-valuemin="0"
@@ -327,9 +351,9 @@ function Order() {
                         )}
 
                         <div className="d-grid gap-2 d-md-flex justify-content-md-start">
-                            <button 
-                                type="button" 
-                                onClick={handleUpload} 
+                            <button
+                                type="button"
+                                onClick={handleUpload}
                                 disabled={isUploadButtonDisabled}
                                 className="btn btn-primary btn-lg"
                             >
@@ -349,19 +373,19 @@ function Order() {
                     <div className="mt-5 pt-4 border-top">
                         <div className="mb-3">
                             <label htmlFor="ordersDateInput" className="form-label">Data entrada dos pedidos</label>
-                            <input 
-                                id="ordersDateInput" 
-                                type="date" 
-                                className="form-control" 
-                                value={pageData.currentPdfDate.toISOString().split('T')[0]} 
+                            <input
+                                id="ordersDateInput"
+                                type="date"
+                                className="form-control"
+                                value={pageData.currentPdfDate.toISOString().split('T')[0]}
                                 onChange={handleOrderDateChange}
                             />
                         </div>
-                        
+
                         <div className="btn-group" role="group" aria-label="Selecione a versão do PDF">
-                            <button 
-                                type="button" 
-                                onClick={() => handlePdfGeneration()} 
+                            <button
+                                type="button"
+                                onClick={() => handlePdfGeneration()}
                                 disabled={isPdfButtonDisabled}
                                 className="btn btn-secondary btn-lg"
                             >
@@ -374,9 +398,9 @@ function Order() {
                                     'Fazer download do PDF'
                                 )}
                             </button>
-                            <button 
-                                type="button" 
-                                onClick={() => handlePdfGeneration("v2")} 
+                            <button
+                                type="button"
+                                onClick={() => handlePdfGeneration("v2")}
                                 disabled={isPdfButtonDisabled}
                                 className="btn btn-secondary btn-lg"
                             >
@@ -393,8 +417,8 @@ function Order() {
 
                         {/* PDF Generation from CSV Modal Trigger */}
                         <div className="mt-3">
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 className="btn btn-outline-primary"
                                 onClick={handlePdfModalToggle}
                             >
@@ -408,12 +432,12 @@ function Order() {
                         <PreOrderTable data={pageData.preOrders} />
                     </div>
 
-                     <PdfGenerationModal 
+                    <PdfGenerationModal
                         show={pageData.showPdfModal}
                         onHide={handlePdfModalToggle}
                         csvFile={pageData.csvFileForPdf}
                         onCsvFileChange={handleCsvFileChange}
-                        onGeneratePdf={handlePdfByFileGeneration} 
+                        onGeneratePdf={handlePdfByFileGeneration}
                     />
                 </div>
             </div>

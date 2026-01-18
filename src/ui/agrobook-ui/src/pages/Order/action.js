@@ -1,13 +1,13 @@
 import api from "../../api/AzFunApi"
 
-export const postFileAsync = async (file, uploadProgress = (progressEvent) => { }) => {
+export const postFileAsync = async (file, uploadProgress = (progressEvent) => { }, preferences = 'pt-BR') => {
     try {
 
         const formData = new FormData();
         formData.append('file', file);
 
         const response = await api.post(
-            'api/financial/order/batch',
+            `api/financial/order/batch?cultureInfo=${preferences}`,
             formData,
             {
                 headers: {

@@ -14,6 +14,7 @@ namespace Bl.Agrobook.Financial.Func.Services;
 
 public class FinancialApiService
 {
+    private static DateTime? LastTokenHealthCheck = null;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
     private static JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -201,7 +202,8 @@ public class FinancialApiService
     private async Task<InternalUserInfo> EnsureApiAuthenticatedAsync(CancellationToken cancellationToken = default)
     {
         var token = _client.DefaultRequestHeaders.Authorization?.Parameter;
-        if (!IsTokenExpired(token))
+        if (!IsTokenExpired(token) &&
+            await IsTokenHealthAsync(cancellationToken))
         {
             return InternalUserInfo.CreateByToken(token);
         }
@@ -210,7 +212,8 @@ public class FinancialApiService
         {
             await _semaphore.WaitAsync(cancellationToken);
 
-            if (!IsTokenExpired(_client.DefaultRequestHeaders.Authorization?.Parameter))
+            if (!IsTokenExpired(token) &&
+                await IsTokenHealthAsync(cancellationToken))
             {
                 return InternalUserInfo.CreateByToken(token);
             }
@@ -221,7 +224,10 @@ public class FinancialApiService
                 !IsTokenExpired(objStorageToken.Token))
             {
                 _client.DefaultRequestHeaders.Authorization = new("Bearer", objStorageToken.Token);
-                return InternalUserInfo.CreateByToken(objStorageToken.Token );
+                if (await IsTokenHealthAsync(cancellationToken))
+                {
+                    return InternalUserInfo.CreateByToken(objStorageToken.Token);
+                }
             }
 
             var authurl = string.Concat(_options.AuthBaseUrl.Trim('/'), '/', "api/v1/authenticate");
@@ -299,6 +305,45 @@ public class FinancialApiService
         }
 
         return null;
+    }
+
+    private async Task<bool> IsTokenHealthAsync(CancellationToken cancellationToken = default)
+    {
+        bool wasTokenCheckedLastMinute()
+        {
+            if (LastTokenHealthCheck is null) return false;
+
+            var timeSinceLastCheck = DateTime.UtcNow - LastTokenHealthCheck.Value;
+            return timeSinceLastCheck < TimeSpan.FromMinutes(1);
+        }
+
+        if (wasTokenCheckedLastMinute())
+        {
+            return true;
+        }
+
+        try
+        {
+            var token = _client.DefaultRequestHeaders.Authorization?.Parameter;
+
+            if (IsTokenExpired(token))
+            {
+                return false;
+            }
+
+            var userInfo = InternalUserInfo.CreateByToken(token);
+            using var response = await _client.GetAsync($"api/v1/preferences/{userInfo.ShopCode}/config", cancellationToken);
+            var health = response.IsSuccessStatusCode;
+
+            if (health)
+                LastTokenHealthCheck = DateTime.UtcNow;
+
+            return health;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private record InternalUserInfo(
